@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import ModeSelector from '../components/divination/ModeSelector'
 import CoinToss from '../components/divination/CoinToss'
@@ -7,8 +7,19 @@ import HexagramDisplay from '../components/divination/HexagramDisplay'
 import { performDivination } from '../lib/yijing/divination'
 import type { DivinationMode, DivinationResult } from '../types/yijing'
 
+function useIsMobile(breakpoint = 640) {
+  const [isMobile, setIsMobile] = useState(window.innerWidth < breakpoint)
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < breakpoint)
+    window.addEventListener('resize', handler)
+    return () => window.removeEventListener('resize', handler)
+  }, [breakpoint])
+  return isMobile
+}
+
 export default function DivinationPage() {
   const navigate = useNavigate()
+  const isMobile = useIsMobile()
   const [mode, setMode] = useState<DivinationMode>('coin')
   const [result, setResult] = useState<DivinationResult | null>(null)
 
@@ -22,9 +33,9 @@ export default function DivinationPage() {
   }
 
   return (
-    <div className="min-h-screen bg-warm-white flex flex-col items-center p-6">
+    <div className="min-h-screen bg-warm-white flex flex-col items-center p-4 sm:p-6">
       {/* Header */}
-      <div className="w-full max-w-2xl flex items-center mb-8">
+      <div className="w-full max-w-2xl flex items-center mb-6 sm:mb-8">
         <button
           onClick={() => navigate('/')}
           className="text-ink-gray hover:text-lake-green transition-colors duration-200 p-1"
@@ -45,7 +56,8 @@ export default function DivinationPage() {
       )}
 
       {/* Main card */}
-      <div className={`bg-pure-white rounded-card shadow-card p-8 w-full flex flex-col items-center ${result ? 'max-w-4xl' : 'max-w-lg'}`}>
+      <div className={`bg-pure-white rounded-card shadow-card w-full flex flex-col items-center
+        ${isMobile ? 'p-4' : 'p-8'} ${result ? 'max-w-4xl' : 'max-w-lg'}`}>
         {!result && mode === 'coin' && (
           <CoinToss onComplete={handleComplete} />
         )}
@@ -55,9 +67,12 @@ export default function DivinationPage() {
         )}
 
         {result && (
-          <div className="flex flex-col items-center gap-6 w-full">
-            {/* 本卦 + 变卦 side by side */}
-            <div className={`flex gap-12 w-full justify-center ${result.changed ? '' : ''}`}>
+          <div className="flex flex-col items-center gap-4 sm:gap-6 w-full">
+            {/* 本卦 + 变卦: stack on mobile, side by side on desktop */}
+            <div className={`flex w-full justify-center
+              ${result.changed
+                ? 'flex-col sm:flex-row gap-6 sm:gap-12'
+                : ''}`}>
               {/* 本卦 */}
               <div className="flex flex-col items-center">
                 <h2 className="text-lg text-ink-gray tracking-wide mb-3">本卦</h2>
@@ -67,6 +82,7 @@ export default function DivinationPage() {
                   najia={result.originalNajia}
                   liuChong={result.original.liuChong}
                   liuHe={result.original.liuHe}
+                  compact={isMobile}
                 />
                 <p className="text-sm text-ink-gray mt-3 max-w-xs text-center">{result.original.guaCi}</p>
               </div>
@@ -80,6 +96,7 @@ export default function DivinationPage() {
                     hexagramName={result.changed.name}
                     najia={result.changedNajia}
                     showShiYing={false}
+                    compact={isMobile}
                   />
                 </div>
               )}
