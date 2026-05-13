@@ -13,10 +13,15 @@ export default function HexagramDisplay({ yaos, hexagramName }: Props) {
   return (
     <div className="flex flex-col items-center gap-3">
       {sorted.map((yao) => (
-        <div key={yao.position} className="flex items-center justify-center">
+        <div key={yao.position} className="relative flex items-center justify-center" style={{ width: LINE_WIDTH + 24 }}>
           <YaoLine polarity={yao.polarity} isChanging={yao.isChanging} />
           {yao.isChanging && (
-            <span className="ml-3 w-2 h-2 rounded-full bg-lake-green flex-shrink-0" />
+            <span
+              className="absolute text-lake-green font-bold"
+              style={{ right: 0, top: '50%', transform: 'translateY(-50%)', fontSize: 14 }}
+            >
+              {yao.polarity === 'yang' ? '○' : '×'}
+            </span>
           )}
         </div>
       ))}
