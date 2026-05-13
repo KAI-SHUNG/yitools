@@ -61,7 +61,7 @@ export default function CoinToss({ onComplete }: Props) {
               `}
               style={{ perspective: '200px' }}
             >
-              {isFlipping ? '' : value === 3 ? '字' : value === 2 ? '花' : '?'}
+              {isFlipping ? '' : value === 3 ? '花' : value === 2 ? '字' : '?'}
             </div>
           )
         })}
