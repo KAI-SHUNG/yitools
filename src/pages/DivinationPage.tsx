@@ -37,7 +37,7 @@ export default function DivinationPage() {
       {/* Header */}
       <div className="w-full max-w-2xl flex items-center mb-6 sm:mb-8">
         <button
-          onClick={() => navigate('/')}
+          onClick={() => result ? setResult(null) : navigate('/')}
           className="text-ink-gray hover:text-lake-green transition-colors duration-200 p-1"
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
