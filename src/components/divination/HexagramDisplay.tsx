@@ -13,9 +13,9 @@ interface Props {
 export default function HexagramDisplay({ yaos, hexagramName, najia, liuChong, liuHe, showShiYing = true, compact = false }: Props) {
   const sorted = [...yaos].sort((a, b) => b.position - a.position)
   const lineWidth = compact ? 64 : 96
-  const leftW = compact ? 100 : 150
-  const rightW = compact ? 44 : 60
-  const rowMinW = compact ? 220 : 320
+  const leftW = compact ? 110 : 150
+  const rightW = compact ? 40 : 60
+  const rowMinW = compact ? 230 : 320
 
   return (
     <div className="flex flex-col items-center">
@@ -43,18 +43,18 @@ export default function HexagramDisplay({ yaos, hexagramName, najia, liuChong, l
           return (
             <div key={yao.position} className="flex items-center" style={{ minWidth: rowMinW }}>
               {/* Left: 伏藏 + 六亲 + 地支五行 */}
-              <div className={`flex items-center text-xs ${compact ? 'gap-1' : 'gap-1.5'}`} style={{ width: leftW, justifyContent: 'flex-end' }}>
+              <div className={`flex items-center text-xs whitespace-nowrap ${compact ? 'gap-0.5' : 'gap-1.5'}`} style={{ width: leftW, justifyContent: 'flex-end' }}>
                 {fuCangLine ? (
-                  <span className="text-ink-light">
+                  <span className="text-ink-light shrink-0">
                     {fuCangLine.liuQin}{fuCangLine.diZhi}{fuCangLine.wuXing}
                   </span>
                 ) : (
-                  <span className="text-ink-light" style={{ width: compact ? 44 : 60 }}></span>
+                  <span className="text-ink-light shrink-0" style={{ width: compact ? 32 : 60 }}></span>
                 )}
                 {lineNajia ? (
                   <>
-                    <span className="text-ink-black font-bold">{lineNajia.liuQin}</span>
-                    <span className="text-ink-black font-bold">{lineNajia.diZhi}{lineNajia.wuXing}</span>
+                    <span className="text-ink-black font-bold shrink-0">{lineNajia.liuQin}</span>
+                    <span className="text-ink-black font-bold shrink-0">{lineNajia.diZhi}{lineNajia.wuXing}</span>
                   </>
                 ) : (
                   <span className="text-ink-light">--</span>
