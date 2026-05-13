@@ -31,9 +31,13 @@ jobs:
       - run: npm ci
       - run: npm run build
 
+      - name: Verify build output
+        run: ls -la dist/ && head dist/index.html
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
 
-      - id: deployment
+      - name: Deploy to GitHub Pages
+        id: deployment
         uses: actions/deploy-pages@v4
