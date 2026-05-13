@@ -13,7 +13,7 @@ export default function HexagramDisplay({ yaos, hexagramName }: Props) {
   return (
     <div className="flex flex-col items-center gap-3">
       {sorted.map((yao) => (
-        <div key={yao.position} className="relative flex items-center justify-center" style={{ width: LINE_WIDTH + 24 }}>
+        <div key={yao.position} className="relative flex items-center justify-center" style={{ width: LINE_WIDTH + 40 }}>
           <YaoLine polarity={yao.polarity} isChanging={yao.isChanging} />
           {yao.isChanging && (
             <span

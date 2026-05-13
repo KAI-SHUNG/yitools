@@ -86,7 +86,7 @@ export default function CoinToss({ onComplete }: Props) {
           {[...tosses].reverse().map((toss, i) => {
             const position = tosses.length - i
             return (
-              <div key={position} className="relative flex items-center justify-center" style={{ width: LINE_WIDTH + 20 }}>
+              <div key={position} className="relative flex items-center justify-center" style={{ width: LINE_WIDTH + 36 }}>
                 <TossLine polarity={toss.polarity} isChanging={toss.isChanging} />
                 {toss.isChanging && (
                   <span
