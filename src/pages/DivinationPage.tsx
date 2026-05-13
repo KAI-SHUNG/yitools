@@ -5,6 +5,7 @@ import CoinToss from '../components/divination/CoinToss'
 import ManualInput from '../components/divination/ManualInput'
 import HexagramDisplay from '../components/divination/HexagramDisplay'
 import { performDivination } from '../lib/yijing/divination'
+import { getDateTimePillars } from '../lib/yijing/datetime'
 import type { DivinationMode, DivinationResult } from '../types/yijing'
 
 function useIsMobile(breakpoint = 640) {
@@ -66,8 +67,21 @@ export default function DivinationPage() {
           <ManualInput onComplete={handleComplete} />
         )}
 
-        {result && (
+        {result && (() => {
+          const dt = getDateTimePillars(result.timestamp)
+          return (
           <div className="flex flex-col items-center gap-4 sm:gap-6 w-full">
+            {/* 日期时间 */}
+            <div className="text-center text-sm leading-loose">
+              <p className="text-ink-gray">日期 {dt.date}</p>
+              <p className="text-ink-black">
+                {dt.yearPillar} | <span className="text-red-600 font-bold">{dt.monthPillar}</span> | <span className="text-red-600 font-bold">{dt.dayPillar}</span> | {dt.hourPillar}
+              </p>
+              <p className="text-ink-black">
+                旬空：<span className="text-red-600 font-bold">{dt.shunKong[0]}{dt.shunKong[1]}</span>
+              </p>
+            </div>
+
             {/* 本卦 + 变卦: stack on mobile, side by side on desktop */}
             <div className={`flex w-full justify-center
               ${result.changed
@@ -118,7 +132,7 @@ export default function DivinationPage() {
               重新起卦
             </button>
           </div>
-        )}
+          )})()}
       </div>
     </div>
   )

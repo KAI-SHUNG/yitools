@@ -36,7 +36,8 @@ export default function HexagramDisplay({ yaos, hexagramName, najia, liuChong, l
         {liuHe && <span className="text-lake-green text-xs">六合</span>}
       </div>
 
-      <div className={`flex flex-col ${compact ? 'gap-1.5' : 'gap-2.5'}`}>
+      {/* Shift rows left to center the yao lines under the name */}
+      <div className={`flex flex-col ${compact ? 'gap-1.5' : 'gap-2.5'}`} style={{ marginLeft: -(leftW - rightW) / 2 }}>
         {sorted.map((yao) => {
           const lineNajia = najia?.lines[yao.position - 1]
           const fuCangLine = najia?.fuCang?.[yao.position - 1]
