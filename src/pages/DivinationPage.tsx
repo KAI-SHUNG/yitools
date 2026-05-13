@@ -46,7 +46,7 @@ export default function DivinationPage() {
             <path d="M12 19l-7-7 7-7" />
           </svg>
         </button>
-        <h1 className="text-xl tracking-widest text-ink-black mx-auto pr-8">起卦</h1>
+        <h1 className="text-xl sm:text-2xl tracking-widest text-ink-black mx-auto pr-8">起卦</h1>
       </div>
 
       {/* Mode selector */}
@@ -72,7 +72,7 @@ export default function DivinationPage() {
           return (
           <div className="flex flex-col items-center gap-4 sm:gap-6 w-full">
             {/* 日期时间 */}
-            <div className="text-center text-sm leading-loose">
+            <div className="text-center leading-loose text-xs sm:text-sm">
               <p className="text-ink-gray">日期 {dt.date}</p>
               <p className="text-ink-black">
                 {dt.yearPillar} | <span className="text-red-600 font-bold">{dt.monthPillar}</span> | <span className="text-red-600 font-bold">{dt.dayPillar}</span> | {dt.hourPillar}
@@ -89,7 +89,7 @@ export default function DivinationPage() {
                 : ''}`}>
               {/* 本卦 */}
               <div className="flex flex-col items-center">
-                <h2 className="text-lg text-ink-gray tracking-wide mb-3">本卦</h2>
+                <h2 className="text-base sm:text-lg text-ink-gray tracking-wide mb-3">本卦</h2>
                 <HexagramDisplay
                   yaos={result.original.yaos}
                   hexagramName={result.original.name}
@@ -98,13 +98,13 @@ export default function DivinationPage() {
                   liuHe={result.original.liuHe}
                   compact={isMobile}
                 />
-                <p className="text-sm text-ink-gray mt-3 max-w-xs text-center">{result.original.guaCi}</p>
+                <p className="text-xs sm:text-sm text-ink-gray mt-3 max-w-xs text-center">{result.original.guaCi}</p>
               </div>
 
               {/* 变卦 */}
               {result.changed && (
                 <div className="flex flex-col items-center">
-                  <h2 className="text-lg text-ink-gray tracking-wide mb-3">变卦</h2>
+                  <h2 className="text-base sm:text-lg text-ink-gray tracking-wide mb-3">变卦</h2>
                   <HexagramDisplay
                     yaos={result.changed.yaos}
                     hexagramName={result.changed.name}
@@ -118,7 +118,7 @@ export default function DivinationPage() {
 
             {/* 动爻信息 */}
             {result.changingPositions.length > 0 && (
-              <p className="text-sm text-lake-green">
+              <p className="text-xs sm:text-sm text-lake-green">
                 动爻：第 {result.changingPositions.join('、')} 爻
               </p>
             )}
@@ -127,7 +127,7 @@ export default function DivinationPage() {
             <button
               onClick={handleReset}
               className="text-ink-gray hover:text-lake-green transition-colors
-                         duration-200 tracking-wide"
+                         duration-200 tracking-wide text-sm sm:text-base"
             >
               重新起卦
             </button>
