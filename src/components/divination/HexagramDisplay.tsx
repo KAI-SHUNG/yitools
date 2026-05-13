@@ -5,14 +5,15 @@ interface Props {
   hexagramName?: string
 }
 
+const LINE_WIDTH = 96 // px
+
 export default function HexagramDisplay({ yaos, hexagramName }: Props) {
-  // Render from top (position 6) to bottom (position 1)
   const sorted = [...yaos].sort((a, b) => b.position - a.position)
 
   return (
     <div className="flex flex-col items-center gap-3">
       {sorted.map((yao) => (
-        <div key={yao.position} className="flex items-center w-32">
+        <div key={yao.position} className="flex items-center justify-center">
           <YaoLine polarity={yao.polarity} isChanging={yao.isChanging} />
           {yao.isChanging && (
             <span className="ml-3 w-2 h-2 rounded-full bg-lake-green flex-shrink-0" />
@@ -29,16 +30,20 @@ export default function HexagramDisplay({ yaos, hexagramName }: Props) {
 }
 
 function YaoLine({ polarity, isChanging }: { polarity: 'yang' | 'yin'; isChanging: boolean }) {
-  const color = isChanging ? 'bg-lake-green' : 'bg-ink-black'
+  const color = isChanging ? '#3a9e8f' : '#1a1a1a'
 
   if (polarity === 'yang') {
-    return <div className={`w-24 h-1.5 ${color} rounded-sm`} />
+    return (
+      <div
+        style={{ width: LINE_WIDTH, height: 6, backgroundColor: color, borderRadius: 2 }}
+      />
+    )
   }
-  // Broken line: two shorter segments with a gap
+  const segWidth = (LINE_WIDTH - 16) / 2
   return (
-    <div className="flex gap-3">
-      <div className={`w-10 h-1.5 ${color} rounded-sm`} />
-      <div className={`w-10 h-1.5 ${color} rounded-sm`} />
+    <div style={{ display: 'flex', gap: 16 }}>
+      <div style={{ width: segWidth, height: 6, backgroundColor: color, borderRadius: 2 }} />
+      <div style={{ width: segWidth, height: 6, backgroundColor: color, borderRadius: 2 }} />
     </div>
   )
 }

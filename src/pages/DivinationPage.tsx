@@ -7,23 +7,18 @@ import HexagramDisplay from '../components/divination/HexagramDisplay'
 import { performDivination } from '../lib/yijing/divination'
 import type { DivinationMode, DivinationResult } from '../types/yijing'
 
-type PageState = 'mode-select' | 'input' | 'result'
-
 export default function DivinationPage() {
   const navigate = useNavigate()
   const [mode, setMode] = useState<DivinationMode>('coin')
-  const [pageState, setPageState] = useState<PageState>('mode-select')
   const [result, setResult] = useState<DivinationResult | null>(null)
 
   const handleComplete = (sums: number[]) => {
     const divResult = performDivination(sums)
     setResult(divResult)
-    setPageState('result')
   }
 
   const handleReset = () => {
     setResult(null)
-    setPageState('mode-select')
   }
 
   return (
@@ -42,33 +37,23 @@ export default function DivinationPage() {
         <h1 className="text-xl tracking-widest text-ink-black mx-auto pr-8">起卦</h1>
       </div>
 
-      {/* Main card */}
-      <div className="bg-pure-white rounded-card shadow-card p-8 w-full max-w-lg">
-        {pageState === 'mode-select' && (
-          <div className="flex flex-col items-center gap-6">
-            <p className="text-ink-gray text-sm">请选择起卦方式</p>
-            <ModeSelector mode={mode} onChange={setMode} />
-            <button
-              onClick={() => setPageState('input')}
-              className="bg-lake-green text-pure-white px-8 py-3 rounded-card
-                         hover:bg-lake-green-dark transition-colors duration-300
-                         tracking-widest text-base"
-            >
-              开始
-            </button>
-          </div>
-        )}
+      {/* Mode selector */}
+      <div className="mb-6">
+        <ModeSelector mode={mode} onChange={(m) => { setMode(m); setResult(null); }} />
+      </div>
 
-        {pageState === 'input' && mode === 'coin' && (
+      {/* Main card */}
+      <div className="bg-pure-white rounded-card shadow-card p-8 w-full max-w-lg flex flex-col items-center">
+        {!result && mode === 'coin' && (
           <CoinToss onComplete={handleComplete} />
         )}
 
-        {pageState === 'input' && mode === 'manual' && (
+        {!result && mode === 'manual' && (
           <ManualInput onComplete={handleComplete} />
         )}
 
-        {pageState === 'result' && result && (
-          <div className="flex flex-col items-center gap-8">
+        {result && (
+          <div className="flex flex-col items-center gap-8 w-full">
             {/* 本卦 */}
             <div className="text-center">
               <h2 className="text-lg text-ink-gray tracking-wide mb-4">本卦</h2>
