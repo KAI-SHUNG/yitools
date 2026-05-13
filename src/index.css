@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  font-family: 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB',
+               'Microsoft YaHei', 'WenQuanYi Micro Hei',
+               system-ui, -apple-system, sans-serif;
+  color: #1a1a1a;
+  background-color: #ffffff;
+  min-height: 100vh;
+}
+
+@keyframes coin-flip {
+  0%   { transform: rotateY(0deg); }
+  50%  { transform: rotateY(90deg); }
+  100% { transform: rotateY(360deg); }
+}
+
+.animate-coin-flip {
+  animation: coin-flip 0.8s ease-in-out;
+}
