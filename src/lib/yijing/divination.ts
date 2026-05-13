@@ -1,8 +1,9 @@
-import type { Yao, CoinTossResult, Hexagram, DivinationResult, LinePolarity } from '../../types/yijing'
+import type { Yao, CoinTossResult, Hexagram, DivinationResult, LinePolarity, NajiaData } from '../../types/yijing'
 import { lookupHexagram } from './hexagrams'
 import { TRIGRAMS } from './trigrams'
+import { getFullNajia } from './najia'
 
-/** Generate a random coin toss result using crypto-grade randomness */
+/** Generate a random coin toss result */
 export function tossCoins(): CoinTossResult {
   const coins: [number, number, number] = [
     Math.random() < 0.5 ? 3 : 2,
@@ -41,7 +42,23 @@ export function buildHexagram(yaos: Yao[]): Hexagram | null {
     upperTrigram: TRIGRAMS[entry.upper].name,
     lowerTrigram: TRIGRAMS[entry.lower].name,
     guaCi: entry.guaCi,
+    liuChong: entry.liuChong,
+    liuHe: entry.liuHe,
   }
+}
+
+/** Get trigram key from trigram name */
+function getTrigramKey(name: string): string | undefined {
+  return Object.keys(TRIGRAMS).find(key => TRIGRAMS[key].name === name)
+}
+
+/** Get Na Jia data for a hexagram */
+function computeNajia(hexagram: Hexagram): NajiaData | null {
+  const upperKey = getTrigramKey(hexagram.upperTrigram)
+  const lowerKey = getTrigramKey(hexagram.lowerTrigram)
+  if (!upperKey || !lowerKey) return null
+  const polarities = hexagram.yaos.map(y => y.polarity)
+  return getFullNajia(upperKey, lowerKey, polarities)
 }
 
 /** Derive the changed hexagram by flipping changing lines */
@@ -68,5 +85,7 @@ export function performDivination(sums: number[]): DivinationResult {
     changed,
     changingPositions,
     timestamp: new Date(),
+    originalNajia: computeNajia(original),
+    changedNajia: changed ? computeNajia(changed) : null,
   }
 }

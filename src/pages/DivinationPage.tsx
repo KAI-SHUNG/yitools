@@ -24,7 +24,7 @@ export default function DivinationPage() {
   return (
     <div className="min-h-screen bg-warm-white flex flex-col items-center p-6">
       {/* Header */}
-      <div className="w-full max-w-lg flex items-center mb-8">
+      <div className="w-full max-w-2xl flex items-center mb-8">
         <button
           onClick={() => navigate('/')}
           className="text-ink-gray hover:text-lake-green transition-colors duration-200 p-1"
@@ -38,12 +38,14 @@ export default function DivinationPage() {
       </div>
 
       {/* Mode selector */}
-      <div className="mb-6">
-        <ModeSelector mode={mode} onChange={(m) => { setMode(m); setResult(null); }} />
-      </div>
+      {!result && (
+        <div className="mb-6">
+          <ModeSelector mode={mode} onChange={(m) => { setMode(m); setResult(null); }} />
+        </div>
+      )}
 
       {/* Main card */}
-      <div className="bg-pure-white rounded-card shadow-card p-8 w-full max-w-lg flex flex-col items-center">
+      <div className={`bg-pure-white rounded-card shadow-card p-8 w-full flex flex-col items-center ${result ? 'max-w-4xl' : 'max-w-lg'}`}>
         {!result && mode === 'coin' && (
           <CoinToss onComplete={handleComplete} />
         )}
@@ -53,27 +55,34 @@ export default function DivinationPage() {
         )}
 
         {result && (
-          <div className="flex flex-col items-center gap-8 w-full">
-            {/* 本卦 */}
-            <div className="text-center">
-              <h2 className="text-lg text-ink-gray tracking-wide mb-4">本卦</h2>
-              <HexagramDisplay
-                yaos={result.original.yaos}
-                hexagramName={result.original.name}
-              />
-              <p className="text-sm text-ink-gray mt-3">{result.original.guaCi}</p>
-            </div>
-
-            {/* 变卦 */}
-            {result.changed && (
-              <div className="text-center">
-                <h2 className="text-lg text-ink-gray tracking-wide mb-4">变卦</h2>
+          <div className="flex flex-col items-center gap-6 w-full">
+            {/* 本卦 + 变卦 side by side */}
+            <div className={`flex gap-12 w-full justify-center ${result.changed ? '' : ''}`}>
+              {/* 本卦 */}
+              <div className="flex flex-col items-center">
+                <h2 className="text-lg text-ink-gray tracking-wide mb-3">本卦</h2>
                 <HexagramDisplay
-                  yaos={result.changed.yaos}
-                  hexagramName={result.changed.name}
+                  yaos={result.original.yaos}
+                  hexagramName={result.original.name}
+                  najia={result.originalNajia}
+                  liuChong={result.original.liuChong}
+                  liuHe={result.original.liuHe}
                 />
+                <p className="text-sm text-ink-gray mt-3 max-w-xs text-center">{result.original.guaCi}</p>
               </div>
-            )}
+
+              {/* 变卦 */}
+              {result.changed && (
+                <div className="flex flex-col items-center">
+                  <h2 className="text-lg text-ink-gray tracking-wide mb-3">变卦</h2>
+                  <HexagramDisplay
+                    yaos={result.changed.yaos}
+                    hexagramName={result.changed.name}
+                    najia={result.changedNajia}
+                  />
+                </div>
+              )}
+            </div>
 
             {/* 动爻信息 */}
             {result.changingPositions.length > 0 && (
