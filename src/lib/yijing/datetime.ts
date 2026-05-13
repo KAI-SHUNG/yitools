@@ -58,19 +58,23 @@ function monthPillar(date: Date): { gan: string; zhi: string } {
 }
 
 // ─── Day Pillar ───
-// Uses Julian Day Number method
+// Uses Gregorian Julian Day Number method
+
+function gregorianJdn(y: number, m: number, d: number): number {
+  const a = Math.floor((14 - m) / 12)
+  const yy = y + 4800 - a
+  const mm = m + 12 * a - 3
+  return d + Math.floor((153 * mm + 2) / 5) + 365 * yy + Math.floor(yy / 4) - Math.floor(yy / 100) + Math.floor(yy / 400) - 32045
+}
 
 function dayPillar(date: Date): { gan: string; zhi: string } {
   const y = date.getFullYear()
   const m = date.getMonth() + 1
   const d = date.getDate()
-  // Julian Day Number
-  let jdn = Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m < 3 ? m + 12 : m + 1)) + d - 1524.5
-  // Adjust for 真太阳时 if needed (simplified: use standard time)
-  // Day 天干地支: reference 甲子 = JDN 11 (Jan 1, 1 CE was 辛酉)
-  // Actually, a known reference: 2000-01-07 = 甲子日 (JDN 2451551)
-  const refJdn = 2451551 // 2000-01-07 = 甲子
-  const diff = Math.floor(jdn) - refJdn
+  const jdn = gregorianJdn(y, m, d)
+  // 2000-01-07 = 甲子日 (JDN 2451551)
+  const refJdn = 2451551
+  const diff = jdn - refJdn
   const ganIdx = ((diff % 10) + 10) % 10
   const zhiIdx = ((diff % 12) + 12) % 12
   return {
@@ -107,19 +111,19 @@ function hourPillar(date: Date): { gan: string; zhi: string } {
 }
 
 // ─── 旬空 ───
+// Each 旬 spans 10 天干 × 10 地支, leaving 2 地支 unused (空亡)
+// 旬0(甲子):戌亥 旬1(甲戌):申酉 旬2(甲申):午未
+// 旬3(甲午):辰巳 旬4(甲辰):寅卯 旬5(甲寅):子丑
 
 function getShunKong(date: Date): string[] {
   const dp = dayPillar(date)
   const ganIdx = TIAN_GAN.indexOf(dp.gan)
   const zhiIdx = DI_ZHI.indexOf(dp.zhi)
-  // Position in 60-cycle determines the 旬
-  const pos = ((zhiIdx - ganIdx) + 12) % 12
-  // Each 旬 has two missing branches:
-  // 旬0(甲子):午未 旬1(甲戌):申酉 旬2(甲申):戌亥
-  // 旬3(甲午):子丑 旬4(甲辰):寅卯 旬5(甲寅):辰巳
-  const xunIdx = pos / 2
-  const m1 = (xunIdx * 2 + 6) % 12
-  const m2 = (m1 + 1) % 12
+  // The 旬 starts at the 甲 whose 地支 is:
+  const startZhi = (zhiIdx - ganIdx + 12) % 12
+  // 空亡 = the two 地支 after the 旬's last member (癸 + 9 地支)
+  const m1 = (startZhi + 10) % 12
+  const m2 = (startZhi + 11) % 12
   return [DI_ZHI[m1], DI_ZHI[m2]]
 }
 

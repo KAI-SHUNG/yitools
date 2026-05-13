@@ -73,7 +73,7 @@ export default function DivinationPage() {
           <div className="flex flex-col items-center gap-4 sm:gap-6 w-full">
             {/* 日期时间 */}
             <div className="text-center leading-loose text-xs sm:text-sm">
-              <p className="text-ink-gray">日期 {dt.date}</p>
+              <p className="text-ink-gray text-base">日期 {dt.date}</p>
               <p className="text-ink-black">
                 {dt.yearPillar} | <span className="text-red-600 font-bold">{dt.monthPillar}</span> | <span className="text-red-600 font-bold">{dt.dayPillar}</span> | {dt.hourPillar}
               </p>
