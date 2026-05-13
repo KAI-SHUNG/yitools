@@ -272,36 +272,74 @@ export function getNajiaData(upperTrigram: string, lowerTrigram: string, palace:
   return lines
 }
 
+// ─── 伏藏 positions per palace ───
+// Indexed by PALACES array order: [本宫, 一世, 二世, 三世, 四世, 五世, 游魂, 归魂]
+// Each entry lists line positions (1-based) where 伏藏 exists.
+// 乾坎艮坤: 四世/五世/游魂=[1,2,3], 归魂=[3]
+// 兑离震巽: 四世/五世=[1,3], 游魂=[1,3,4], 归魂=[4]
+const FU_CANG_POSITIONS: number[][][] = [
+  // 乾(金)
+  [[], [2], [1,2], [1], [1,2,3], [1,2,3], [1,2,3], [3]],
+  // 坎(水)
+  [[], [3], [1,3], [1], [1,2,3], [1,2,3], [1,2,3], [3]],
+  // 艮(土)
+  [[], [3], [1,3], [1], [1,2,3], [1,2,3], [1,2,3], [3]],
+  // 震(木)
+  [[], [2], [1,2], [1], [1,3], [1,3], [1,3,4], [4]],
+  // 巽(木)
+  [[], [3], [1,3], [1], [1,2], [1,2], [1,2,4], [4]],
+  // 离(火)
+  [[], [2], [1,2], [1], [1,3], [1,3], [1,3,4], [4]],
+  // 坤(土)
+  [[], [3], [1,3], [1], [1,2,3], [1,2,3], [1,2,3], [3]],
+  // 兑(金)
+  [[], [3], [1,3], [1], [1,2], [1,2], [1,2,3], [3]],
+]
+
+/** Get 伏藏 data: returns sparse array, only positions with hidden lines have data */
+export function getFuCang(palace: PalaceInfo, palaceIdx: number): (NajiaLine | undefined)[] {
+  const pos = palace.position - 1  // 0-based
+  const positions = FU_CANG_POSITIONS[palaceIdx]?.[pos] ?? []
+
+  if (positions.length === 0) return []
+
+  // Root hexagram (本宫卦) Na Jia data
+  const root = PALACES[palaceIdx].hexagrams[0]
+  const rootPalace: PalaceInfo = {
+    ...palace,
+    position: 1,
+    type: '',
+    isYouHun: false,
+    isGuiHun: false,
+    shiPosition: 6,
+    yingPosition: 3,
+  }
+  const rootLines = getNajiaData(root.upper, root.lower, rootPalace)
+
+  // Build sparse result: only include lines at fu cang positions
+  const result: (NajiaLine | undefined)[] = []
+  for (let i = 0; i < 6; i++) {
+    result.push(positions.includes(i + 1) ? rootLines[i] : undefined)
+  }
+  return result
+}
+
 /** Get complete Na Jia data for a hexagram */
 export function getFullNajia(upperTrigram: string, lowerTrigram: string, yaos: LinePolarity[]): NajiaData | undefined {
+  if (yaos.length !== 6) return undefined
+  const lowerLines: [LinePolarity, LinePolarity, LinePolarity] = [yaos[0], yaos[1], yaos[2]]
+  const upperLines: [LinePolarity, LinePolarity, LinePolarity] = [yaos[3], yaos[4], yaos[5]]
+  const lowerKey = trigramFromLines(lowerLines)
+  const upperKey = trigramFromLines(upperLines)
+  if (!lowerKey || !upperKey) return undefined
+
+  const entry = PALACE_MAP.get(`${upperKey}-${lowerKey}`)
+  if (!entry) return undefined
+
   const palace = lookupPalace(yaos)
   if (!palace) return undefined
   const lines = getNajiaData(upperTrigram, lowerTrigram, palace)
-  return { lines, palace }
+  const fuCang = getFuCang(palace, entry.palaceIdx)
+  return { lines, palace, fuCang }
 }
 
-// ─── 六冲 / 六合 ───
-
-const CHONG_PAIRS: [DiZhi, DiZhi][] = [
-  ['子', '午'], ['丑', '未'], ['寅', '申'], ['卯', '酉'], ['辰', '戌'], ['巳', '亥'],
-]
-
-const HE_PAIRS: [DiZhi, DiZhi][] = [
-  ['子', '丑'], ['寅', '亥'], ['卯', '戌'], ['辰', '酉'], ['巳', '申'], ['午', '未'],
-]
-
-function branchPairsWith(a: DiZhi, b: DiZhi, pairs: [DiZhi, DiZhi][]): boolean {
-  return pairs.some(([x, y]) => (a === x && b === y) || (a === y && b === x))
-}
-
-/** Check if line at position (1-6) has 六冲 with any other line */
-export function hasChong(lines: NajiaLine[], position: number): boolean {
-  const target = lines[position - 1]
-  return lines.some((l, i) => i !== position - 1 && branchPairsWith(target.diZhi, l.diZhi, CHONG_PAIRS))
-}
-
-/** Check if line at position (1-6) has 六合 with any other line */
-export function hasHe(lines: NajiaLine[], position: number): boolean {
-  const target = lines[position - 1]
-  return lines.some((l, i) => i !== position - 1 && branchPairsWith(target.diZhi, l.diZhi, HE_PAIRS))
-}

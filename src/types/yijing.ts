@@ -76,4 +76,5 @@ export interface PalaceInfo {
 export interface NajiaData {
   lines: NajiaLine[]
   palace: PalaceInfo
+  fuCang: (NajiaLine | undefined)[]  // 伏藏: sparse, only positions with hidden lines have data
 }

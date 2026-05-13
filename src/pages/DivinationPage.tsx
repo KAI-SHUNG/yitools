@@ -79,6 +79,7 @@ export default function DivinationPage() {
                     yaos={result.changed.yaos}
                     hexagramName={result.changed.name}
                     najia={result.changedNajia}
+                    showShiYing={false}
                   />
                 </div>
               )}

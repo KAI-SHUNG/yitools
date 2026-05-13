@@ -1,4 +1,4 @@
-import type { Yao, CoinTossResult, Hexagram, DivinationResult, LinePolarity, NajiaData } from '../../types/yijing'
+import type { Yao, CoinTossResult, Hexagram, DivinationResult, NajiaData } from '../../types/yijing'
 import { lookupHexagram } from './hexagrams'
 import { TRIGRAMS } from './trigrams'
 import { getFullNajia } from './najia'
@@ -58,7 +58,7 @@ function computeNajia(hexagram: Hexagram): NajiaData | null {
   const lowerKey = getTrigramKey(hexagram.lowerTrigram)
   if (!upperKey || !lowerKey) return null
   const polarities = hexagram.yaos.map(y => y.polarity)
-  return getFullNajia(upperKey, lowerKey, polarities)
+  return getFullNajia(upperKey, lowerKey, polarities) ?? null
 }
 
 /** Derive the changed hexagram by flipping changing lines */
