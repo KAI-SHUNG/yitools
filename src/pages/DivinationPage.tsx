@@ -111,6 +111,7 @@ export default function DivinationPage() {
                     najia={result.changedNajia}
                     showShiYing={false}
                     compact={isMobile}
+                    highlightPositions={result.changingPositions}
                   />
                 </div>
               )}

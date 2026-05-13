@@ -8,9 +8,10 @@ interface Props {
   liuHe?: boolean
   showShiYing?: boolean
   compact?: boolean
+  highlightPositions?: number[]
 }
 
-export default function HexagramDisplay({ yaos, hexagramName, najia, liuChong, liuHe, showShiYing = true, compact = false }: Props) {
+export default function HexagramDisplay({ yaos, hexagramName, najia, liuChong, liuHe, showShiYing = true, compact = false, highlightPositions = [] }: Props) {
   const sorted = [...yaos].sort((a, b) => b.position - a.position)
   const lineWidth = compact ? 64 : 108
   const leftW = compact ? 110 : 190
@@ -40,6 +41,7 @@ export default function HexagramDisplay({ yaos, hexagramName, najia, liuChong, l
         {sorted.map((yao) => {
           const lineNajia = najia?.lines[yao.position - 1]
           const fuCangLine = najia?.fuCang?.[yao.position - 1]
+          const isHighlighted = highlightPositions.includes(yao.position)
           return (
             <div key={yao.position} className="flex items-center" style={{ minWidth: rowMinW }}>
               {/* Left: 伏藏 + 六亲 + 地支五行 */}
@@ -53,8 +55,8 @@ export default function HexagramDisplay({ yaos, hexagramName, najia, liuChong, l
                 )}
                 {lineNajia ? (
                   <>
-                    <span className="text-ink-black font-bold shrink-0">{lineNajia.liuQin}</span>
-                    <span className="text-ink-black font-bold shrink-0">{lineNajia.diZhi}{lineNajia.wuXing}</span>
+                    <span className={`font-bold shrink-0 ${isHighlighted ? 'text-lake-green' : 'text-ink-black'}`}>{lineNajia.liuQin}</span>
+                    <span className={`font-bold shrink-0 ${isHighlighted ? 'text-lake-green' : 'text-ink-black'}`}>{lineNajia.diZhi}{lineNajia.wuXing}</span>
                   </>
                 ) : (
                   <span className="text-ink-light">--</span>
@@ -63,7 +65,7 @@ export default function HexagramDisplay({ yaos, hexagramName, najia, liuChong, l
 
               {/* Center: Yao line */}
               <div className="relative flex items-center justify-center mx-2" style={{ width: lineWidth }}>
-                <YaoLine polarity={yao.polarity} isChanging={yao.isChanging} lineWidth={lineWidth} />
+                <YaoLine polarity={yao.polarity} isChanging={yao.isChanging} lineWidth={lineWidth} highlight={isHighlighted} />
               </div>
 
               {/* Right: 世/应 then ○/× */}
@@ -87,8 +89,8 @@ export default function HexagramDisplay({ yaos, hexagramName, najia, liuChong, l
   )
 }
 
-function YaoLine({ polarity, isChanging, lineWidth }: { polarity: 'yang' | 'yin'; isChanging: boolean; lineWidth: number }) {
-  const color = isChanging ? '#3a9e8f' : '#1a1a1a'
+function YaoLine({ polarity, isChanging, lineWidth, highlight }: { polarity: 'yang' | 'yin'; isChanging: boolean; lineWidth: number; highlight?: boolean }) {
+  const color = isChanging || highlight ? '#3a9e8f' : '#1a1a1a'
   const h = 6
 
   if (polarity === 'yang') {
