@@ -4,9 +4,12 @@ import ModeSelector from '../components/divination/ModeSelector'
 import CoinToss from '../components/divination/CoinToss'
 import ManualInput from '../components/divination/ManualInput'
 import HexagramDisplay from '../components/divination/HexagramDisplay'
+import UserMenu from '../components/auth/UserMenu'
 import { performDivination } from '../lib/yijing/divination'
 import { getDateTimePillars } from '../lib/yijing/datetime'
 import { YAO_CI } from '../data/yaoci'
+import { useAuth } from '../hooks/useAuth'
+import { supabase } from '../lib/supabase/client'
 import type { DivinationMode, DivinationResult } from '../types/yijing'
 
 function useIsMobile(breakpoint = 640) {
@@ -22,12 +25,35 @@ function useIsMobile(breakpoint = 640) {
 export default function DivinationPage() {
   const navigate = useNavigate()
   const isMobile = useIsMobile()
+  const { user } = useAuth()
   const [mode, setMode] = useState<DivinationMode>('coin')
   const [result, setResult] = useState<DivinationResult | null>(null)
+  const [question, setQuestion] = useState('')
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
 
   const handleComplete = (sums: number[]) => {
     const divResult = performDivination(sums)
     setResult(divResult)
+    setSaveStatus('idle')
+  }
+
+  const handleSave = async () => {
+    if (!user) {
+      navigate('/login')
+      return
+    }
+    if (!question.trim()) return
+    if (!result) return
+
+    setSaveStatus('saving')
+    const { error } = await supabase.from('divinations').insert({
+      user_id: user.id,
+      question: question.trim(),
+      wen_number: result.original.wenNumber,
+      changed_wen_number: result.changed?.wenNumber ?? null,
+      changing_positions: result.changingPositions,
+    })
+    setSaveStatus(error ? 'error' : 'saved')
   }
 
   return (
@@ -44,11 +70,20 @@ export default function DivinationPage() {
           </svg>
         </button>
         <h1 className="text-xl sm:text-2xl tracking-widest text-ink-black mx-auto pr-8">起卦</h1>
+        <UserMenu />
       </div>
 
-      {/* Mode selector */}
+      {/* 事项 input + Mode selector */}
       {!result && (
-        <div className="mb-6">
+        <div className="mb-6 w-full max-w-lg flex flex-col items-center gap-4">
+          <input
+            type="text"
+            placeholder="所问事项（如：近期事业如何）"
+            value={question}
+            onChange={e => setQuestion(e.target.value)}
+            className="w-full border border-gray-300 rounded-card px-4 py-2.5 text-sm sm:text-base
+                       bg-pure-white focus:outline-none focus:border-lake-green placeholder:text-ink-light"
+          />
           <ModeSelector mode={mode} onChange={(m) => { setMode(m); setResult(null); }} />
         </div>
       )}
@@ -68,6 +103,13 @@ export default function DivinationPage() {
           const dt = getDateTimePillars(result.timestamp)
           return (
           <div className="flex flex-col items-center gap-4 sm:gap-6 w-full">
+            {/* 事项 */}
+            {question.trim() && (
+              <p className="text-ink-black text-base sm:text-lg font-medium tracking-wide">
+                {question.trim()}
+              </p>
+            )}
+
             {/* 日期时间 */}
             <div className="text-center leading-loose text-base sm:text-lg">
               <p className="text-ink-gray">日期 {dt.date}</p>
@@ -120,6 +162,22 @@ export default function DivinationPage() {
                 动爻：第 {result.changingPositions.join('、')} 爻
               </p>
             )}
+
+            {/* 保存按钮 */}
+            <button
+              onClick={handleSave}
+              disabled={saveStatus === 'saving' || saveStatus === 'saved'}
+              className={`mt-2 px-6 py-2 rounded text-sm tracking-wide transition-all
+                ${saveStatus === 'saved'
+                  ? 'bg-lake-green/20 text-lake-green cursor-default'
+                  : 'bg-lake-green text-white hover:opacity-90 disabled:opacity-50'
+                }`}
+            >
+              {saveStatus === 'idle' && (user ? '保存记录' : '登录后保存')}
+              {saveStatus === 'saving' && '保存中...'}
+              {saveStatus === 'saved' && '已保存'}
+              {saveStatus === 'error' && '保存失败，点击重试'}
+            </button>
           </div>
           )})()}
       </div>
@@ -132,7 +190,7 @@ export default function DivinationPage() {
         const yaoPosNames = ['初', '二', '三', '四', '五', '上']
         const yaos = result.original.yaos
         // Display top to bottom: position 6(上) down to 1(初)
-        const rows = [...yaos].reverse().map((yao, i) => {
+        const rows = [...yaos].reverse().map((yao) => {
           const posName = yaoPosNames[yao.position - 1]
           const gan = yao.polarity === 'yang' ? '九' : '六'
           const label = posName === '上' || posName === '初'

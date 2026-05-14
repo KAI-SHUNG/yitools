@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import UserMenu from '../components/auth/UserMenu'
 
 function BaguaIcon({ className }: { className?: string }) {
   return (
@@ -37,7 +38,10 @@ export default function HomePage() {
   const weekday = today.toLocaleDateString('zh-CN', { weekday: 'long' })
 
   return (
-    <div className="min-h-screen bg-pure-white flex flex-col items-center justify-center p-6 lg:flex-row lg:gap-16">
+    <div className="min-h-screen bg-pure-white flex flex-col items-center justify-center p-6 lg:flex-row lg:gap-16 relative">
+      <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
+        <UserMenu />
+      </div>
       {/* Date Card */}
       <div className="bg-pure-white rounded-card shadow-card p-8 w-full max-w-sm text-center lg:max-w-xs lg:flex-shrink-0">
         <p className="text-3xl font-light text-ink-black tracking-wide">
