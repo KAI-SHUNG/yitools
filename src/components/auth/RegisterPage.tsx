@@ -16,10 +16,11 @@ export default function RegisterPage() {
     setLoading(true)
 
     // 1. Verify invite code
+    const code = inviteCode.trim()
     const { data: codeRow, error: codeError } = await supabase
       .from('invite_codes')
       .select('code')
-      .eq('code', inviteCode)
+      .eq('code', code)
       .eq('used', false)
       .single()
 
@@ -38,7 +39,7 @@ export default function RegisterPage() {
     }
 
     // 3. Mark invite code as used
-    await supabase.from('invite_codes').update({ used: true }).eq('code', inviteCode)
+    await supabase.from('invite_codes').update({ used: true }).eq('code', code)
 
     setLoading(false)
     navigate('/')
