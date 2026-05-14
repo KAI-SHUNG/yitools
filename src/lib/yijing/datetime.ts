@@ -72,14 +72,12 @@ function dayPillar(date: Date): { gan: string; zhi: string } {
   const m = date.getMonth() + 1
   const d = date.getDate()
   const jdn = gregorianJdn(y, m, d)
-  // 2000-01-07 = 甲子日 (JDN 2451551)
-  const refJdn = 2451551
-  const diff = jdn - refJdn
-  const ganIdx = ((diff % 10) + 10) % 10
-  const zhiIdx = ((diff % 12) + 12) % 12
+  // sexagenary index = (JDN + 49) % 60
+  // Verified: 1949-10-01=甲子, 2008-05-12=壬子, 2024-02-10=甲辰
+  const sex = (jdn + 49) % 60
   return {
-    gan: TIAN_GAN[ganIdx],
-    zhi: DI_ZHI[zhiIdx],
+    gan: TIAN_GAN[sex % 10],
+    zhi: DI_ZHI[sex % 12],
   }
 }
 

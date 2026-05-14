@@ -6,6 +6,7 @@ import ManualInput from '../components/divination/ManualInput'
 import HexagramDisplay from '../components/divination/HexagramDisplay'
 import { performDivination } from '../lib/yijing/divination'
 import { getDateTimePillars } from '../lib/yijing/datetime'
+import { YAO_CI } from '../data/yaoci'
 import type { DivinationMode, DivinationResult } from '../types/yijing'
 
 function useIsMobile(breakpoint = 640) {
@@ -27,10 +28,6 @@ export default function DivinationPage() {
   const handleComplete = (sums: number[]) => {
     const divResult = performDivination(sums)
     setResult(divResult)
-  }
-
-  const handleReset = () => {
-    setResult(null)
   }
 
   return (
@@ -73,7 +70,7 @@ export default function DivinationPage() {
           <div className="flex flex-col items-center gap-4 sm:gap-6 w-full">
             {/* 日期时间 */}
             <div className="text-center leading-loose text-xs sm:text-sm">
-              <p className="text-ink-gray text-base">日期 {dt.date}</p>
+              <p className="text-ink-gray text-lg">日期 {dt.date}</p>
               <p className="text-ink-black">
                 {dt.yearPillar} | <span className="text-red-600 font-bold">{dt.monthPillar}</span> | <span className="text-red-600 font-bold">{dt.dayPillar}</span> | {dt.hourPillar}
               </p>
@@ -123,18 +120,42 @@ export default function DivinationPage() {
                 动爻：第 {result.changingPositions.join('、')} 爻
               </p>
             )}
-
-            {/* 重新起卦 */}
-            <button
-              onClick={handleReset}
-              className="text-ink-gray hover:text-lake-green transition-colors
-                         duration-200 tracking-wide text-sm sm:text-base"
-            >
-              重新起卦
-            </button>
           </div>
           )})()}
       </div>
+
+      {/* 爻辞 section */}
+      {result && (() => {
+        const wenNum = result.original.wenNumber
+        const yaoci = wenNum ? YAO_CI[wenNum] : null
+        if (!yaoci || yaoci.every(y => !y)) return null
+        const yaoPosNames = ['初', '二', '三', '四', '五', '上']
+        const yaos = result.original.yaos
+        // Display top to bottom: position 6(上) down to 1(初)
+        const rows = [...yaos].reverse().map((yao, i) => {
+          const posName = yaoPosNames[yao.position - 1]
+          const gan = yao.polarity === 'yang' ? '九' : '六'
+          const label = posName === '上' || posName === '初'
+            ? `${posName}${gan}`
+            : `${gan}${posName}`
+          const text = yaoci[yao.position - 1]
+          const isChanging = result.changingPositions.includes(yao.position)
+          return { label, text, isChanging }
+        })
+        return (
+          <div className="bg-pure-white rounded-card shadow-card w-full max-w-4xl mt-4 sm:mt-6 p-4 sm:p-8">
+            <p className="text-ink-gray text-sm mb-3 tracking-wide">爻辞</p>
+            <div className="flex flex-col gap-1.5">
+              {rows.map(({ label, text, isChanging }) => (
+                <div key={label} className={`flex gap-3 text-sm sm:text-base leading-relaxed ${isChanging ? 'text-lake-green font-bold' : 'text-ink-black'}`}>
+                  <span className="shrink-0 w-10 text-right">{label}</span>
+                  <span>{text}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )
+      })()}
     </div>
   )
 }
