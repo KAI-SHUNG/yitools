@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
-import { supabase } from '../../lib/supabase/client'
+import { getSupabase } from '../../lib/supabase/client'
 
 export default function UserMenu() {
   const { user } = useAuth()
@@ -15,7 +15,8 @@ export default function UserMenu() {
   }
 
   const handleLogout = async () => {
-    await supabase.auth.signOut()
+    const sb = getSupabase()
+    if (sb) await sb.auth.signOut()
     navigate('/')
   }
 

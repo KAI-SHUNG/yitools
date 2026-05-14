@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { supabase } from '../../lib/supabase/client'
+import { getSupabase } from '../../lib/supabase/client'
 
 export default function LoginPage() {
   const navigate = useNavigate()
@@ -13,7 +13,9 @@ export default function LoginPage() {
     e.preventDefault()
     setError('')
     setLoading(true)
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const sb = getSupabase()
+    if (!sb) { setError('服务未配置'); setLoading(false); return }
+    const { error } = await sb.auth.signInWithPassword({ email, password })
     setLoading(false)
     if (error) {
       setError(error.message)

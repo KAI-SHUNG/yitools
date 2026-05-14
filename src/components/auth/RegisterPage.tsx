@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { supabase } from '../../lib/supabase/client'
+import { getSupabase } from '../../lib/supabase/client'
 
 export default function RegisterPage() {
   const navigate = useNavigate()
@@ -15,9 +15,12 @@ export default function RegisterPage() {
     setError('')
     setLoading(true)
 
+    const sb = getSupabase()
+    if (!sb) { setError('服务未配置'); setLoading(false); return }
+
     // 1. Verify invite code
     const code = inviteCode.trim()
-    const { data: codeRow, error: codeError } = await supabase
+    const { data: codeRow, error: codeError } = await sb
       .from('invite_codes')
       .select('code')
       .eq('code', code)
@@ -31,7 +34,7 @@ export default function RegisterPage() {
     }
 
     // 2. Sign up
-    const { error: signUpError } = await supabase.auth.signUp({ email, password })
+    const { error: signUpError } = await sb.auth.signUp({ email, password })
     if (signUpError) {
       setLoading(false)
       setError(signUpError.message)
@@ -39,7 +42,7 @@ export default function RegisterPage() {
     }
 
     // 3. Mark invite code as used
-    await supabase.from('invite_codes').update({ used: true }).eq('code', code)
+    await sb.from('invite_codes').update({ used: true }).eq('code', code)
 
     setLoading(false)
     navigate('/')

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import UserMenu from '../components/auth/UserMenu'
 import { useAuth } from '../hooks/useAuth'
-import { supabase } from '../lib/supabase/client'
+import { getSupabase } from '../lib/supabase/client'
 import { HEXAGRAM_DATA } from '../lib/yijing/hexagrams'
 
 interface DivinationRecord {
@@ -26,8 +26,9 @@ export default function HistoryPage() {
       navigate('/login')
       return
     }
-    supabase
-      .from('divinations')
+    const sb = getSupabase()
+    if (!sb) { setFetching(false); return }
+    sb.from('divinations')
       .select('*')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })

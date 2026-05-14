@@ -9,7 +9,7 @@ import { performDivination } from '../lib/yijing/divination'
 import { getDateTimePillars } from '../lib/yijing/datetime'
 import { YAO_CI } from '../data/yaoci'
 import { useAuth } from '../hooks/useAuth'
-import { supabase } from '../lib/supabase/client'
+import { getSupabase } from '../lib/supabase/client'
 import type { DivinationMode, DivinationResult } from '../types/yijing'
 
 function useIsMobile(breakpoint = 640) {
@@ -45,8 +45,10 @@ export default function DivinationPage() {
     if (!question.trim()) return
     if (!result) return
 
+    const sb = getSupabase()
+    if (!sb) { setSaveStatus('error'); return }
     setSaveStatus('saving')
-    const { error } = await supabase.from('divinations').insert({
+    const { error } = await sb.from('divinations').insert({
       user_id: user.id,
       question: question.trim(),
       wen_number: result.original.wenNumber,
