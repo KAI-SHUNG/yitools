@@ -14,6 +14,7 @@ create table divinations (
   wen_number smallint not null,                    -- 本卦文王序号
   changed_wen_number smallint,                     -- 变卦序号（无变卦为null）
   changing_positions smallint[] not null default '{}', -- 动爻位置
+  divination_time timestamptz not null,                -- 起卦时间
   created_at timestamptz default now()
 );
 

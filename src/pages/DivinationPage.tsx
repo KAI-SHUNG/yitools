@@ -54,6 +54,7 @@ export default function DivinationPage() {
       wen_number: result.original.wenNumber,
       changed_wen_number: result.changed?.wenNumber ?? null,
       changing_positions: result.changingPositions,
+      divination_time: result.timestamp.toISOString(),
     })
     setSaveStatus(error ? 'error' : 'saved')
   }
@@ -61,18 +62,20 @@ export default function DivinationPage() {
   return (
     <div className="min-h-screen bg-warm-white flex flex-col items-center p-4 sm:p-6">
       {/* Header */}
-      <div className="w-full max-w-2xl flex items-center mb-6 sm:mb-8">
+      <div className="w-full max-w-2xl relative flex items-center justify-center mb-6 sm:mb-8">
         <button
           onClick={() => result ? setResult(null) : navigate('/')}
-          className="text-ink-gray hover:text-lake-green transition-colors duration-200 p-1"
+          className="absolute left-0 text-ink-gray hover:text-lake-green transition-colors duration-200 p-1"
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M19 12H5" />
             <path d="M12 19l-7-7 7-7" />
           </svg>
         </button>
-        <h1 className="text-xl sm:text-2xl tracking-widest text-ink-black mx-auto pr-8">起卦</h1>
-        <UserMenu />
+        <h1 className="text-xl sm:text-2xl tracking-widest text-ink-black">起卦</h1>
+        <div className="absolute right-0">
+          <UserMenu />
+        </div>
       </div>
 
       {/* 事项 input + Mode selector */}

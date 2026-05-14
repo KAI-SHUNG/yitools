@@ -1,5 +1,5 @@
-import type { Yao, CoinTossResult, Hexagram, DivinationResult, NajiaData } from '../../types/yijing'
-import { lookupHexagram } from './hexagrams'
+import type { Yao, CoinTossResult, Hexagram, DivinationResult, NajiaData, LinePolarity } from '../../types/yijing'
+import { lookupHexagram, HEXAGRAM_DATA } from './hexagrams'
 import { TRIGRAMS } from './trigrams'
 import { getFullNajia } from './najia'
 
@@ -71,6 +71,41 @@ export function deriveChangedHexagram(original: Hexagram): Hexagram | null {
     isChanging: false,
   }))
   return buildHexagram(changedYaos)
+}
+
+/** Reconstruct a DivinationResult from saved data */
+export function reconstructDivination(
+  wenNumber: number,
+  changingPositions: number[],
+  timestamp: Date,
+  changedWenNumber?: number | null,
+): DivinationResult | null {
+  const entry = HEXAGRAM_DATA.find(h => h.wenNumber === wenNumber)
+  if (!entry) return null
+
+  const lowerLines = TRIGRAMS[entry.lower].lines
+  const upperLines = TRIGRAMS[entry.upper].lines
+  const polarities: LinePolarity[] = [...lowerLines, ...upperLines]
+
+  const yaos: Yao[] = polarities.map((p, i) => ({
+    position: i + 1,
+    polarity: p,
+    isChanging: changingPositions.includes(i + 1),
+  }))
+
+  const original = buildHexagram(yaos)
+  if (!original) return null
+
+  const changed = changingPositions.length > 0 ? deriveChangedHexagram(original) : null
+
+  return {
+    original,
+    changed,
+    changingPositions,
+    timestamp,
+    originalNajia: computeNajia(original),
+    changedNajia: changed ? computeNajia(changed) : null,
+  }
 }
 
 /** Complete divination from 6 coin toss sums */

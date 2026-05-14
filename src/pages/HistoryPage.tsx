@@ -11,6 +11,7 @@ interface DivinationRecord {
   wen_number: number
   changed_wen_number: number | null
   changing_positions: number[]
+  divination_time: string
   created_at: string
 }
 
@@ -49,18 +50,20 @@ export default function HistoryPage() {
   return (
     <div className="min-h-screen bg-warm-white flex flex-col items-center p-4 sm:p-6">
       {/* Header */}
-      <div className="w-full max-w-2xl flex items-center mb-6 sm:mb-8">
+      <div className="w-full max-w-2xl relative flex items-center justify-center mb-6 sm:mb-8">
         <button
           onClick={() => navigate('/')}
-          className="text-ink-gray hover:text-lake-green transition-colors duration-200 p-1"
+          className="absolute left-0 text-ink-gray hover:text-lake-green transition-colors duration-200 p-1"
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M19 12H5" />
             <path d="M12 19l-7-7 7-7" />
           </svg>
         </button>
-        <h1 className="text-xl sm:text-2xl tracking-widest text-ink-black mx-auto pr-8">历史记录</h1>
-        <UserMenu />
+        <h1 className="text-xl sm:text-2xl tracking-widest text-ink-black">历史记录</h1>
+        <div className="absolute right-0">
+          <UserMenu />
+        </div>
       </div>
 
       {/* Content */}
@@ -75,10 +78,11 @@ export default function HistoryPage() {
         ) : (
           <div className="flex flex-col gap-3">
             {records.map(r => (
-              <div key={r.id} className="bg-pure-white rounded-card shadow-card p-4 sm:p-5">
+              <Link key={r.id} to={`/history/${r.id}`}
+                className="bg-pure-white rounded-card shadow-card p-4 sm:p-5 hover:shadow-lg transition-shadow cursor-pointer">
                 <p className="text-ink-black font-medium text-sm sm:text-base mb-1">{r.question}</p>
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs sm:text-sm text-ink-gray">
-                  <span>{formatDate(r.created_at)}</span>
+                  <span>{formatDate(r.divination_time || r.created_at)}</span>
                   <span className="text-ink-black">{hexName(r.wen_number)}</span>
                   {r.changed_wen_number && (
                     <>
@@ -90,7 +94,7 @@ export default function HistoryPage() {
                     <span className="text-lake-green">动爻：{r.changing_positions.join('、')}</span>
                   )}
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}
