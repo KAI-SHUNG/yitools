@@ -103,10 +103,8 @@ export default function DivinationPage() {
           placeholder="所问事项（如：近期事业如何）"
           value={question}
           onChange={e => setQuestion(e.target.value)}
-          readOnly={!!result}
-          className={`w-full border border-gray-300 rounded-card px-4 py-2.5 text-sm sm:text-base
-                     bg-pure-white focus:outline-none focus:border-lake-green placeholder:text-ink-light
-                     ${result ? 'text-ink-black cursor-default' : ''}`}
+          className="w-full border border-gray-300 rounded-card px-4 py-2.5 text-sm sm:text-base
+                     bg-pure-white focus:outline-none focus:border-lake-green placeholder:text-ink-light"
         />
         {!result && (
           <>
