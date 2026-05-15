@@ -7,7 +7,6 @@ import { getSupabase } from '../lib/supabase/client'
 import { reconstructDivination } from '../lib/yijing/divination'
 import { getDateTimePillars } from '../lib/yijing/datetime'
 import { generateCopyText } from '../lib/yijing/copyText'
-import DateTimePicker from '../components/divination/DateTimePicker'
 import { YAO_CI } from '../data/yaoci'
 import type { DivinationResult } from '../types/yijing'
 
@@ -122,13 +121,10 @@ export default function HistoryDetailPage() {
                 </p>
               )}
 
-              {/* 起卦时间 */}
-              <div className="flex flex-col items-center gap-2">
-                <DateTimePicker value={new Date(record.divination_time)} />
-                <p className="text-xs text-ink-light">
-                  入库 {new Date(record.created_at).toLocaleString('zh-CN')}
-                </p>
-              </div>
+              {/* 保存时间 */}
+              <p className="text-xs text-ink-light">
+                保存时间 {new Date(record.created_at).toLocaleString('zh-CN')}
+              </p>
 
               {/* 干支时间 */}
               <div className="text-center leading-loose text-base sm:text-lg">
