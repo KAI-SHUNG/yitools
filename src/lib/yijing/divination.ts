@@ -78,7 +78,7 @@ export function reconstructDivination(
   wenNumber: number,
   changingPositions: number[],
   timestamp: Date,
-  changedWenNumber?: number | null,
+  _changedWenNumber?: number | null, // eslint-disable-line @typescript-eslint/no-unused-vars
 ): DivinationResult | null {
   const entry = HEXAGRAM_DATA.find(h => h.wenNumber === wenNumber)
   if (!entry) return null

@@ -1,4 +1,5 @@
 import type { DivinationResult } from '../../types/yijing'
+import { HEXAGRAM_DATA } from './hexagrams'
 import { getDateTimePillars } from './datetime'
 
 /** Get palace type label: 本宫/一世/二世/.../游魂/归魂 */
@@ -18,7 +19,9 @@ function formatHexagramSection(
   const najia = isChanged ? result.changedNajia : result.originalNajia
   const lines: string[] = []
 
-  lines.push(hexagram.name + (hexagram.fullName !== hexagram.name ? `（${hexagram.fullName}）` : ''))
+  const entry = hexagram.wenNumber ? HEXAGRAM_DATA.find(h => h.wenNumber === hexagram.wenNumber) : null
+  const shortName = entry?.name ?? hexagram.name
+  lines.push(hexagram.name + (shortName !== hexagram.name ? `（${shortName}）` : ''))
 
   if (najia?.palace) {
     const p = najia.palace

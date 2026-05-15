@@ -8,6 +8,7 @@ import UserMenu from '../components/auth/UserMenu'
 import { performDivination } from '../lib/yijing/divination'
 import { getDateTimePillars } from '../lib/yijing/datetime'
 import { generateCopyText } from '../lib/yijing/copyText'
+import DateTimePicker from '../components/divination/DateTimePicker'
 import { YAO_CI } from '../data/yaoci'
 import { useAuth } from '../hooks/useAuth'
 import { getSupabase } from '../lib/supabase/client'
@@ -32,10 +33,12 @@ export default function DivinationPage() {
   const [question, setQuestion] = useState('')
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
   const [copyStatus, setCopyStatus] = useState<'idle' | 'copied' | 'no-question'>('idle')
+  const [selectedTime, setSelectedTime] = useState(() => new Date())
 
   const handleComplete = (sums: number[]) => {
     const divResult = performDivination(sums)
     setResult(divResult)
+    setSelectedTime(new Date())
     setSaveStatus('idle')
   }
 
@@ -56,7 +59,7 @@ export default function DivinationPage() {
       wen_number: result.original.wenNumber,
       changed_wen_number: result.changed?.wenNumber ?? null,
       changing_positions: result.changingPositions,
-      divination_time: result.timestamp.toISOString(),
+      divination_time: selectedTime.toISOString(),
     })
     setSaveStatus(error ? 'error' : 'saved')
   }
@@ -68,7 +71,7 @@ export default function DivinationPage() {
       return
     }
     if (!result) return
-    const text = generateCopyText(result, question.trim())
+    const text = generateCopyText({ ...result, timestamp: selectedTime }, question.trim())
     await navigator.clipboard.writeText(text)
     setCopyStatus('copied')
     setTimeout(() => setCopyStatus('idle'), 2000)
@@ -93,20 +96,20 @@ export default function DivinationPage() {
         </div>
       </div>
 
-      {/* 事项 input + Mode selector */}
-      {!result && (
-        <div className="mb-6 w-full max-w-lg flex flex-col items-center gap-4">
-          <input
-            type="text"
-            placeholder="所问事项（如：近期事业如何）"
-            value={question}
-            onChange={e => setQuestion(e.target.value)}
-            className="w-full border border-gray-300 rounded-card px-4 py-2.5 text-sm sm:text-base
-                       bg-pure-white focus:outline-none focus:border-lake-green placeholder:text-ink-light"
-          />
+      {/* 事项 input — 始终显示 */}
+      <div className="mb-6 w-full max-w-lg flex flex-col items-center gap-4">
+        <input
+          type="text"
+          placeholder="所问事项（如：近期事业如何）"
+          value={question}
+          onChange={e => setQuestion(e.target.value)}
+          className="w-full border border-gray-300 rounded-card px-4 py-2.5 text-sm sm:text-base
+                     bg-pure-white focus:outline-none focus:border-lake-green placeholder:text-ink-light"
+        />
+        {!result && (
           <ModeSelector mode={mode} onChange={(m) => { setMode(m); setResult(null); }} />
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Main card */}
       <div className={`bg-pure-white rounded-card shadow-card w-full flex flex-col items-center
@@ -120,17 +123,22 @@ export default function DivinationPage() {
         )}
 
         {result && (() => {
-          const dt = getDateTimePillars(result.timestamp)
+          const dt = getDateTimePillars(selectedTime)
           return (
           <div className="flex flex-col items-center gap-4 sm:gap-6 w-full">
-            {/* 事项 */}
-            {question.trim() && (
-              <p className="text-ink-black text-base sm:text-lg font-medium tracking-wide">
-                {question.trim()}
-              </p>
-            )}
 
-            {/* 日期时间 */}
+            {/* 起卦时间 */}
+            <div className="flex flex-col items-center gap-2">
+              <DateTimePicker value={selectedTime} onChange={setSelectedTime} />
+              <button
+                onClick={() => setSelectedTime(new Date())}
+                className="text-xs text-lake-green hover:underline"
+              >
+                现在
+              </button>
+            </div>
+
+            {/* 干支时间 */}
             <div className="text-center leading-loose text-base sm:text-lg">
               <p className="text-ink-gray">日期 {dt.date}</p>
               <p className="text-ink-black">
