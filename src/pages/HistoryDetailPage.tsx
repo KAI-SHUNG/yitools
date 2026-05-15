@@ -6,6 +6,7 @@ import { useAuth } from '../hooks/useAuth'
 import { getSupabase } from '../lib/supabase/client'
 import { reconstructDivination } from '../lib/yijing/divination'
 import { getDateTimePillars } from '../lib/yijing/datetime'
+import { generateCopyText } from '../lib/yijing/copyText'
 import { YAO_CI } from '../data/yaoci'
 import type { DivinationResult } from '../types/yijing'
 
@@ -36,6 +37,20 @@ export default function HistoryDetailPage() {
   const [record, setRecord] = useState<Record | null>(null)
   const [result, setResult] = useState<DivinationResult | null>(null)
   const [fetching, setFetching] = useState(true)
+  const [copyStatus, setCopyStatus] = useState<'idle' | 'copied' | 'no-question'>('idle')
+
+  const handleCopy = async () => {
+    if (!record?.question?.trim()) {
+      setCopyStatus('no-question')
+      setTimeout(() => setCopyStatus('idle'), 2000)
+      return
+    }
+    if (!result) return
+    const text = generateCopyText(result, record.question.trim())
+    await navigator.clipboard.writeText(text)
+    setCopyStatus('copied')
+    setTimeout(() => setCopyStatus('idle'), 2000)
+  }
 
   useEffect(() => {
     if (loading) return
@@ -157,6 +172,22 @@ export default function HistoryDetailPage() {
                   动爻：第 {result.changingPositions.join('、')} 爻
                 </p>
               )}
+
+              {/* 复制按钮 */}
+              <button
+                onClick={handleCopy}
+                className={`mt-2 px-6 py-2 rounded text-sm tracking-wide transition-all border
+                  ${copyStatus === 'no-question'
+                    ? 'border-red-400 text-red-500 bg-red-50'
+                    : copyStatus === 'copied'
+                      ? 'border-lake-green/40 text-lake-green bg-lake-green/10'
+                      : 'border-gray-300 text-ink-gray hover:border-lake-green hover:text-lake-green'
+                  }`}
+              >
+                {copyStatus === 'idle' && '复制卦象'}
+                {copyStatus === 'copied' && '已复制'}
+                {copyStatus === 'no-question' && '事项为空，无法复制'}
+              </button>
             </div>
           )
         })()}

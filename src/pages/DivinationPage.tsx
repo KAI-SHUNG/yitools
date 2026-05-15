@@ -7,6 +7,7 @@ import HexagramDisplay from '../components/divination/HexagramDisplay'
 import UserMenu from '../components/auth/UserMenu'
 import { performDivination } from '../lib/yijing/divination'
 import { getDateTimePillars } from '../lib/yijing/datetime'
+import { generateCopyText } from '../lib/yijing/copyText'
 import { YAO_CI } from '../data/yaoci'
 import { useAuth } from '../hooks/useAuth'
 import { getSupabase } from '../lib/supabase/client'
@@ -30,6 +31,7 @@ export default function DivinationPage() {
   const [result, setResult] = useState<DivinationResult | null>(null)
   const [question, setQuestion] = useState('')
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+  const [copyStatus, setCopyStatus] = useState<'idle' | 'copied' | 'no-question'>('idle')
 
   const handleComplete = (sums: number[]) => {
     const divResult = performDivination(sums)
@@ -57,6 +59,19 @@ export default function DivinationPage() {
       divination_time: result.timestamp.toISOString(),
     })
     setSaveStatus(error ? 'error' : 'saved')
+  }
+
+  const handleCopy = async () => {
+    if (!question.trim()) {
+      setCopyStatus('no-question')
+      setTimeout(() => setCopyStatus('idle'), 2000)
+      return
+    }
+    if (!result) return
+    const text = generateCopyText(result, question.trim())
+    await navigator.clipboard.writeText(text)
+    setCopyStatus('copied')
+    setTimeout(() => setCopyStatus('idle'), 2000)
   }
 
   return (
@@ -168,21 +183,38 @@ export default function DivinationPage() {
               </p>
             )}
 
-            {/* 保存按钮 */}
-            <button
-              onClick={handleSave}
-              disabled={saveStatus === 'saving' || saveStatus === 'saved'}
-              className={`mt-2 px-6 py-2 rounded text-sm tracking-wide transition-all
-                ${saveStatus === 'saved'
-                  ? 'bg-lake-green/20 text-lake-green cursor-default'
-                  : 'bg-lake-green text-white hover:opacity-90 disabled:opacity-50'
-                }`}
-            >
-              {saveStatus === 'idle' && (user ? '保存记录' : '登录后保存')}
-              {saveStatus === 'saving' && '保存中...'}
-              {saveStatus === 'saved' && '已保存'}
-              {saveStatus === 'error' && '保存失败，点击重试'}
-            </button>
+            {/* 按钮行 */}
+            <div className="flex items-center gap-3 mt-2">
+              <button
+                onClick={handleSave}
+                disabled={saveStatus === 'saving' || saveStatus === 'saved'}
+                className={`px-6 py-2 rounded text-sm tracking-wide transition-all
+                  ${saveStatus === 'saved'
+                    ? 'bg-lake-green/20 text-lake-green cursor-default'
+                    : 'bg-lake-green text-white hover:opacity-90 disabled:opacity-50'
+                  }`}
+              >
+                {saveStatus === 'idle' && (user ? '保存记录' : '登录后保存')}
+                {saveStatus === 'saving' && '保存中...'}
+                {saveStatus === 'saved' && '已保存'}
+                {saveStatus === 'error' && '保存失败，点击重试'}
+              </button>
+
+              <button
+                onClick={handleCopy}
+                className={`px-6 py-2 rounded text-sm tracking-wide transition-all border
+                  ${copyStatus === 'no-question'
+                    ? 'border-red-400 text-red-500 bg-red-50'
+                    : copyStatus === 'copied'
+                      ? 'border-lake-green/40 text-lake-green bg-lake-green/10'
+                      : 'border-gray-300 text-ink-gray hover:border-lake-green hover:text-lake-green'
+                  }`}
+              >
+                {copyStatus === 'idle' && '复制卦象'}
+                {copyStatus === 'copied' && '已复制'}
+                {copyStatus === 'no-question' && '请先填写事项'}
+              </button>
+            </div>
           </div>
           )})()}
       </div>
