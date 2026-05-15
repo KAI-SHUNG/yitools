@@ -96,7 +96,7 @@ export default function DivinationPage() {
         </div>
       </div>
 
-      {/* 事项 input — 始终显示 */}
+      {/* 事项 input + 时间选择 — 始终显示 */}
       <div className="mb-6 w-full max-w-lg flex flex-col items-center gap-4">
         <input
           type="text"
@@ -109,7 +109,18 @@ export default function DivinationPage() {
                      ${result ? 'text-ink-black cursor-default' : ''}`}
         />
         {!result && (
-          <ModeSelector mode={mode} onChange={(m) => { setMode(m); setResult(null); }} />
+          <>
+            <div className="flex flex-col items-center gap-1">
+              <DateTimePicker value={selectedTime} onChange={setSelectedTime} />
+              <button
+                onClick={() => setSelectedTime(new Date())}
+                className="text-sm text-lake-green hover:underline"
+              >
+                现在
+              </button>
+            </div>
+            <ModeSelector mode={mode} onChange={(m) => { setMode(m); setResult(null); }} />
+          </>
         )}
       </div>
 
@@ -128,17 +139,6 @@ export default function DivinationPage() {
           const dt = getDateTimePillars(selectedTime)
           return (
           <div className="flex flex-col items-center gap-4 sm:gap-6 w-full">
-
-            {/* 起卦时间 */}
-            <div className="flex flex-col items-center gap-2">
-              <DateTimePicker value={selectedTime} onChange={setSelectedTime} />
-              <button
-                onClick={() => setSelectedTime(new Date())}
-                className="text-sm text-lake-green hover:underline"
-              >
-                现在
-              </button>
-            </div>
 
             {/* 干支时间 */}
             <div className="text-center leading-loose text-base sm:text-lg">
