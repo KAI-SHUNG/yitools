@@ -103,8 +103,10 @@ export default function DivinationPage() {
           placeholder="所问事项（如：近期事业如何）"
           value={question}
           onChange={e => setQuestion(e.target.value)}
-          className="w-full border border-gray-300 rounded-card px-4 py-2.5 text-sm sm:text-base
-                     bg-pure-white focus:outline-none focus:border-lake-green placeholder:text-ink-light"
+          readOnly={!!result}
+          className={`w-full border border-gray-300 rounded-card px-4 py-2.5 text-sm sm:text-base
+                     bg-pure-white focus:outline-none focus:border-lake-green placeholder:text-ink-light
+                     ${result ? 'text-ink-black cursor-default' : ''}`}
         />
         {!result && (
           <ModeSelector mode={mode} onChange={(m) => { setMode(m); setResult(null); }} />
@@ -132,7 +134,7 @@ export default function DivinationPage() {
               <DateTimePicker value={selectedTime} onChange={setSelectedTime} />
               <button
                 onClick={() => setSelectedTime(new Date())}
-                className="text-xs text-lake-green hover:underline"
+                className="text-sm text-lake-green hover:underline"
               >
                 现在
               </button>

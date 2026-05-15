@@ -40,9 +40,6 @@ export default function HistoryDetailPage() {
   const [result, setResult] = useState<DivinationResult | null>(null)
   const [fetching, setFetching] = useState(true)
   const [copyStatus, setCopyStatus] = useState<'idle' | 'copied' | 'no-question'>('idle')
-  const [editingQuestion, setEditingQuestion] = useState(false)
-  const [questionDraft, setQuestionDraft] = useState('')
-  const [savingQuestion, setSavingQuestion] = useState(false)
 
   const handleCopy = async () => {
     if (!record?.question?.trim()) {
@@ -55,22 +52,6 @@ export default function HistoryDetailPage() {
     await navigator.clipboard.writeText(text)
     setCopyStatus('copied')
     setTimeout(() => setCopyStatus('idle'), 2000)
-  }
-
-  const handleSaveQuestion = async () => {
-    if (!record || !questionDraft.trim()) return
-    const sb = getSupabase()
-    if (!sb) return
-    setSavingQuestion(true)
-    const { error } = await sb.from('divinations')
-      .update({ question: questionDraft.trim() })
-      .eq('id', record.id)
-      .eq('user_id', user!.id)
-    if (!error) {
-      setRecord({ ...record, question: questionDraft.trim() })
-      setEditingQuestion(false)
-    }
-    setSavingQuestion(false)
   }
 
   useEffect(() => {
@@ -134,31 +115,11 @@ export default function HistoryDetailPage() {
           const dt = getDateTimePillars(result.timestamp)
           return (
             <div className="flex flex-col items-center gap-4 sm:gap-6 w-full">
-              {/* 事项 — 可编辑 */}
-              {editingQuestion ? (
-                <div className="flex items-center gap-2 w-full max-w-md">
-                  <input
-                    type="text"
-                    value={questionDraft}
-                    onChange={e => setQuestionDraft(e.target.value)}
-                    className="flex-1 border border-gray-300 rounded-card px-3 py-1.5 text-sm bg-pure-white focus:outline-none focus:border-lake-green"
-                    autoFocus
-                  />
-                  <button onClick={handleSaveQuestion} disabled={savingQuestion} className="px-3 py-1.5 rounded text-sm bg-lake-green text-white hover:opacity-90 disabled:opacity-50">
-                    {savingQuestion ? '...' : '保存'}
-                  </button>
-                  <button onClick={() => setEditingQuestion(false)} className="px-3 py-1.5 rounded text-sm text-ink-gray hover:text-ink-black">
-                    取消
-                  </button>
-                </div>
-              ) : (
-                <button
-                  onClick={() => { setQuestionDraft(record.question); setEditingQuestion(true); }}
-                  className="text-ink-black text-base sm:text-lg font-medium tracking-wide hover:text-lake-green transition-colors"
-                  title="点击编辑事项"
-                >
-                  {record.question || '（无事项，点击添加）'}
-                </button>
+              {/* 事项 */}
+              {record.question && (
+                <p className="text-ink-black text-base sm:text-lg font-medium tracking-wide">
+                  {record.question}
+                </p>
               )}
 
               {/* 起卦时间 */}
