@@ -1,5 +1,5 @@
 import type { LinePolarity, HexagramEntry } from '../../types/yijing'
-import { TRIGRAMS } from './trigrams'
+import { trigramKeyFromLines } from './trigrams'
 
 /** King Wen sequence: all 64 hexagrams */
 export const HEXAGRAM_DATA: HexagramEntry[] = [
@@ -73,20 +73,6 @@ export const HEXAGRAM_DATA: HexagramEntry[] = [
 const HEXAGRAM_MAP = new Map<string, HexagramEntry>()
 for (const entry of HEXAGRAM_DATA) {
   HEXAGRAM_MAP.set(`${entry.upper}-${entry.lower}`, entry)
-}
-
-/** Get trigram key from 3 lines (bottom to top) */
-function trigramKeyFromLines(lines: [LinePolarity, LinePolarity, LinePolarity]): string | undefined {
-  for (const [key, trigram] of Object.entries(TRIGRAMS)) {
-    if (
-      trigram.lines[0] === lines[0] &&
-      trigram.lines[1] === lines[1] &&
-      trigram.lines[2] === lines[2]
-    ) {
-      return key
-    }
-  }
-  return undefined
 }
 
 /** Look up a hexagram by its 6 lines (bottom to top) */
