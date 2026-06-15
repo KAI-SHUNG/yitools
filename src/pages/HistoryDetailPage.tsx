@@ -139,30 +139,30 @@ export default function HistoryDetailPage() {
 
               {/* 本卦 + 变卦 */}
               <div className={`flex w-full justify-center
-                ${result.changed
+                ${result.changedEntry
                   ? 'flex-col sm:flex-row gap-6 sm:gap-12'
                   : ''}`}>
                 {/* 本卦 */}
                 <div className="flex flex-col items-center">
                   <h2 className="text-base sm:text-lg text-ink-gray tracking-wide mb-3">本卦</h2>
                   <HexagramDisplay
-                    yaos={result.original.yaos}
-                    hexagramName={result.original.name}
-                    najia={result.originalNajia}
-                    liuChong={result.original.liuChong}
-                    liuHe={result.original.liuHe}
+                    yaos={result.yaos}
+                    hexagramName={result.entry.fullName}
+                    najia={result.najia}
+                    liuChong={result.entry.liuChong}
+                    liuHe={result.entry.liuHe}
                     compact={isMobile}
                   />
-                  <p className="text-xs sm:text-sm text-ink-gray mt-3 max-w-xs text-center">{result.original.guaCi}</p>
+                  <p className="text-xs sm:text-sm text-ink-gray mt-3 max-w-xs text-center">{result.entry.guaCi}</p>
                 </div>
 
                 {/* 变卦 */}
-                {result.changed && (
+                {result.changedEntry && result.changedYaos && (
                   <div className="flex flex-col items-center">
                     <h2 className="text-base sm:text-lg text-ink-gray tracking-wide mb-3">变卦</h2>
                     <HexagramDisplay
-                      yaos={result.changed.yaos}
-                      hexagramName={result.changed.name}
+                      yaos={result.changedYaos}
+                      hexagramName={result.changedEntry.fullName}
                       najia={result.changedNajia}
                       showShiYing={false}
                       showFuCang={false}
@@ -202,11 +202,11 @@ export default function HistoryDetailPage() {
 
       {/* 爻辞 section */}
       {result && (() => {
-        const wenNum = result.original.wenNumber
+        const wenNum = result.entry.wenNumber
         const yaoci = wenNum ? YAO_CI[wenNum] : null
         if (!yaoci || yaoci.every(y => !y)) return null
         const yaoPosNames = ['初', '二', '三', '四', '五', '上']
-        const yaos = result.original.yaos
+        const yaos = result.yaos
         const rows = [...yaos].reverse().map((yao) => {
           const posName = yaoPosNames[yao.position - 1]
           const gan = yao.polarity === 'yang' ? '九' : '六'

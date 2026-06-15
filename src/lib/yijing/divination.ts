@@ -1,4 +1,4 @@
-import type { Yao, CoinTossResult, Hexagram, DivinationResult, NajiaData, LinePolarity } from '../../types/yijing'
+import type { Yao, CoinTossResult, HexagramEntry, DivinationResult, NajiaData, LinePolarity } from '../../types/yijing'
 import { lookupHexagram, HEXAGRAM_DATA } from './hexagrams'
 import { TRIGRAMS } from './trigrams'
 import { getFullNajia } from './najia'
@@ -28,49 +28,58 @@ export function sumToYao(sum: number, position: number): Yao {
   }
 }
 
-/** Build a Hexagram from 6 yaos (bottom to top) */
-export function buildHexagram(yaos: Yao[]): Hexagram | null {
-  if (yaos.length !== 6) return null
-  const polarities = yaos.map(y => y.polarity)
-  const entry = lookupHexagram(polarities)
-  if (!entry) return null
-
-  return {
-    yaos,
-    wenNumber: entry.wenNumber,
-    name: entry.fullName,
-    upperTrigram: TRIGRAMS[entry.upper].name,
-    lowerTrigram: TRIGRAMS[entry.lower].name,
-    guaCi: entry.guaCi,
-    liuChong: entry.liuChong,
-    liuHe: entry.liuHe,
-  }
-}
-
 /** Get trigram key from trigram name */
-function getTrigramKey(name: string): string | undefined {
+export function getTrigramKey(name: string): string | undefined {
   return Object.keys(TRIGRAMS).find(key => TRIGRAMS[key].name === name)
 }
 
-/** Get Na Jia data for a hexagram */
-function computeNajia(hexagram: Hexagram): NajiaData | null {
-  const upperKey = getTrigramKey(hexagram.upperTrigram)
-  const lowerKey = getTrigramKey(hexagram.lowerTrigram)
-  if (!upperKey || !lowerKey) return null
-  const polarities = hexagram.yaos.map(y => y.polarity)
-  return getFullNajia(upperKey, lowerKey, polarities) ?? null
+/** Get Na Jia data for a hexagram given its entry and yaos */
+function computeNajia(entry: HexagramEntry, yaos: Yao[]): NajiaData | null {
+  const polarities = yaos.map(y => y.polarity)
+  return getFullNajia(entry.upper, entry.lower, polarities) ?? null
 }
 
-/** Derive the changed hexagram by flipping changing lines */
-export function deriveChangedHexagram(original: Hexagram): Hexagram | null {
-  const changedYaos: Yao[] = original.yaos.map(yao => ({
+/** Derive the changed hexagram yaos by flipping changing lines */
+export function deriveChangedYaos(yaos: Yao[]): Yao[] {
+  return yaos.map(yao => ({
     ...yao,
     polarity: yao.isChanging
       ? (yao.polarity === 'yang' ? 'yin' : 'yang')
       : yao.polarity,
     isChanging: false,
   }))
-  return buildHexagram(changedYaos)
+}
+
+/** Complete divination from 6 coin toss sums */
+export function performDivination(sums: number[]): DivinationResult {
+  const yaos: Yao[] = sums.map((sum, i) => sumToYao(sum, i + 1))
+  const polarities = yaos.map(y => y.polarity)
+  const entry = lookupHexagram(polarities)!
+  const changingPositions = yaos.filter(y => y.isChanging).map(y => y.position)
+
+  let changedYaos: Yao[] | null = null
+  let changedEntry: HexagramEntry | null = null
+  let changedNajia: NajiaData | null = null
+
+  if (changingPositions.length > 0) {
+    changedYaos = deriveChangedYaos(yaos)
+    const changedPolarities = changedYaos.map(y => y.polarity)
+    changedEntry = lookupHexagram(changedPolarities) ?? null
+    if (changedEntry) {
+      changedNajia = computeNajia(changedEntry, changedYaos)
+    }
+  }
+
+  return {
+    yaos,
+    entry,
+    changedYaos,
+    changedEntry,
+    changingPositions,
+    timestamp: new Date(),
+    najia: computeNajia(entry, yaos),
+    changedNajia,
+  }
 }
 
 /** Reconstruct a DivinationResult from saved data */
@@ -78,7 +87,7 @@ export function reconstructDivination(
   wenNumber: number,
   changingPositions: number[],
   timestamp: Date,
-  _changedWenNumber?: number | null, // eslint-disable-line @typescript-eslint/no-unused-vars
+  _changedWenNumber?: number | null,
 ): DivinationResult | null {
   const entry = HEXAGRAM_DATA.find(h => h.wenNumber === wenNumber)
   if (!entry) return null
@@ -93,34 +102,27 @@ export function reconstructDivination(
     isChanging: changingPositions.includes(i + 1),
   }))
 
-  const original = buildHexagram(yaos)
-  if (!original) return null
+  let changedYaos: Yao[] | null = null
+  let changedEntry: HexagramEntry | null = null
+  let changedNajia: NajiaData | null = null
 
-  const changed = changingPositions.length > 0 ? deriveChangedHexagram(original) : null
+  if (changingPositions.length > 0) {
+    changedYaos = deriveChangedYaos(yaos)
+    const changedPolarities = changedYaos.map(y => y.polarity)
+    changedEntry = lookupHexagram(changedPolarities) ?? null
+    if (changedEntry) {
+      changedNajia = computeNajia(changedEntry, changedYaos)
+    }
+  }
 
   return {
-    original,
-    changed,
+    yaos,
+    entry,
+    changedYaos,
+    changedEntry,
     changingPositions,
     timestamp,
-    originalNajia: computeNajia(original),
-    changedNajia: changed ? computeNajia(changed) : null,
-  }
-}
-
-/** Complete divination from 6 coin toss sums */
-export function performDivination(sums: number[]): DivinationResult {
-  const yaos: Yao[] = sums.map((sum, i) => sumToYao(sum, i + 1))
-  const original = buildHexagram(yaos)!
-  const changingPositions = yaos.filter(y => y.isChanging).map(y => y.position)
-  const changed = changingPositions.length > 0 ? deriveChangedHexagram(original) : null
-
-  return {
-    original,
-    changed,
-    changingPositions,
-    timestamp: new Date(),
-    originalNajia: computeNajia(original),
-    changedNajia: changed ? computeNajia(changed) : null,
+    najia: computeNajia(entry, yaos),
+    changedNajia,
   }
 }

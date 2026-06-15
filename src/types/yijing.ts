@@ -16,26 +16,28 @@ export interface CoinTossResult {
   isChanging: boolean
 }
 
-/** A complete hexagram (6 lines) */
-export interface Hexagram {
-  yaos: Yao[]
-  wenNumber: number | null
-  name: string
-  upperTrigram: string
-  lowerTrigram: string
+/** Static reference data for one of the 64 hexagrams (King Wen sequence) */
+export interface HexagramEntry {
+  wenNumber: number
+  name: string           // short name e.g. "乾"
+  fullName: string       // full name e.g. "乾为天"
+  upper: string          // upper trigram key e.g. "qian"
+  lower: string          // lower trigram key e.g. "kun"
   guaCi: string
-  liuChong?: boolean
-  liuHe?: boolean
+  liuChong?: boolean     // 六冲卦
+  liuHe?: boolean        // 六合卦
 }
 
 /** The result of a divination session */
 export interface DivinationResult {
-  original: Hexagram
-  changed: Hexagram | null
+  yaos: Yao[]                      // 本卦 6 爻
+  entry: HexagramEntry             // 本卦字典数据
+  changedYaos: Yao[] | null        // 变卦 6 爻
+  changedEntry: HexagramEntry | null  // 变卦字典数据
   changingPositions: number[]
   timestamp: Date
-  originalNajia: NajiaData | null
-  changedNajia: NajiaData | null
+  najia: NajiaData | null          // 本卦纳甲
+  changedNajia: NajiaData | null   // 变卦纳甲
 }
 
 /** Input mode for hexagram generation */

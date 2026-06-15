@@ -1,5 +1,4 @@
-import type { DivinationResult } from '../../types/yijing'
-import { HEXAGRAM_DATA } from './hexagrams'
+import type { DivinationResult, HexagramEntry, Yao, NajiaData } from '../../types/yijing'
 import { getDateTimePillars } from './datetime'
 
 /** Get palace type label: 本宫/一世/二世/.../游魂/归魂 */
@@ -12,30 +11,28 @@ function getPalaceTypeLabel(position: number, isYouHun: boolean, isGuiHun: boole
 
 /** Format one hexagram section (6 lines, top to bottom) for text copy */
 function formatHexagramSection(
-  result: DivinationResult,
-  isChanged: boolean,
+  entry: HexagramEntry,
+  yaos: Yao[],
+  najia: NajiaData | null,
+  showFlags: boolean,
 ): string {
-  const hexagram = isChanged ? result.changed! : result.original
-  const najia = isChanged ? result.changedNajia : result.originalNajia
   const lines: string[] = []
-
-  const entry = hexagram.wenNumber ? HEXAGRAM_DATA.find(h => h.wenNumber === hexagram.wenNumber) : null
-  const shortName = entry?.name ?? hexagram.name
-  lines.push(hexagram.name + (shortName !== hexagram.name ? `（${shortName}）` : ''))
+  const shortName = entry.name
+  lines.push(entry.fullName + (shortName !== entry.fullName ? `（${shortName}）` : ''))
 
   if (najia?.palace) {
     const p = najia.palace
     const typeLabel = getPalaceTypeLabel(p.position, p.isYouHun, p.isGuiHun)
     let label = p.name
     if (typeLabel) label += ` ${typeLabel}`
-    if (!isChanged && hexagram.liuChong) label += ' 六冲'
-    if (!isChanged && hexagram.liuHe) label += ' 六合'
+    if (showFlags && entry.liuChong) label += ' 六冲'
+    if (showFlags && entry.liuHe) label += ' 六合'
     lines.push(label)
   }
 
   // Lines top to bottom (position 6 → 1)
   for (let pos = 6; pos >= 1; pos--) {
-    const yao = hexagram.yaos.find(y => y.position === pos)!
+    const yao = yaos.find(y => y.position === pos)!
     const lineNajia = najia?.lines[pos - 1]
     const fuCang = najia?.fuCang?.[pos - 1]
 
@@ -76,13 +73,13 @@ export function generateCopyText(result: DivinationResult, question: string): st
 
   // 本卦
   parts.push('【本卦】')
-  parts.push(formatHexagramSection(result, false))
+  parts.push(formatHexagramSection(result.entry, result.yaos, result.najia, true))
   parts.push('')
 
   // 变卦
-  if (result.changed) {
+  if (result.changedEntry && result.changedYaos) {
     parts.push('【变卦】')
-    parts.push(formatHexagramSection(result, true))
+    parts.push(formatHexagramSection(result.changedEntry, result.changedYaos, result.changedNajia, false))
   }
 
   return parts.join('\n')

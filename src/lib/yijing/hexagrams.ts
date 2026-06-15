@@ -1,16 +1,5 @@
-import type { LinePolarity } from '../../types/yijing'
+import type { LinePolarity, HexagramEntry } from '../../types/yijing'
 import { TRIGRAMS } from './trigrams'
-
-export interface HexagramEntry {
-  wenNumber: number
-  name: string
-  fullName: string
-  upper: string
-  lower: string
-  guaCi: string
-  liuChong?: boolean  // 六冲卦
-  liuHe?: boolean     // 六合卦
-}
 
 /** King Wen sequence: all 64 hexagrams */
 export const HEXAGRAM_DATA: HexagramEntry[] = [
