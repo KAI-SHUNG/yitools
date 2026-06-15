@@ -1,5 +1,5 @@
 import type { LinePolarity, DiZhi, WuXing, LiuQin, LiuShen, NajiaLine, PalaceInfo, NajiaData } from '../../types/yijing'
-import { TRIGRAMS, trigramKeyFromLines } from './trigrams'
+import { trigramKeyFromLines } from './trigrams'
 
 // ─── Na Jia: Heavenly Stems ───
 
