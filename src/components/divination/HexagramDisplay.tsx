@@ -7,11 +7,12 @@ interface Props {
   liuChong?: boolean
   liuHe?: boolean
   showShiYing?: boolean
+  showFuCang?: boolean
   compact?: boolean
   highlightPositions?: number[]
 }
 
-export default function HexagramDisplay({ yaos, hexagramName, najia, liuChong, liuHe, showShiYing = true, compact = false, highlightPositions = [] }: Props) {
+export default function HexagramDisplay({ yaos, hexagramName, najia, liuChong, liuHe, showShiYing = true, showFuCang = true, compact = false, highlightPositions = [] }: Props) {
   const sorted = [...yaos].sort((a, b) => b.position - a.position)
   const lineWidth = compact ? 64 : 108
   const leftW = compact ? 110 : 190
@@ -40,7 +41,7 @@ export default function HexagramDisplay({ yaos, hexagramName, najia, liuChong, l
       <div className={`flex flex-col ${compact ? 'gap-1.5' : 'gap-3'}`} style={{ marginLeft: -(leftW - rightW) / 2 }}>
         {sorted.map((yao) => {
           const lineNajia = najia?.lines[yao.position - 1]
-          const fuCangLine = najia?.fuCang?.[yao.position - 1]
+          const fuCangLine = showFuCang ? najia?.fuCang?.[yao.position - 1] : undefined
           const isHighlighted = highlightPositions.includes(yao.position)
           return (
             <div key={yao.position} className="flex items-center" style={{ minWidth: rowMinW }}>

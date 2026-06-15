@@ -4,39 +4,39 @@ import type { LinePolarity, DiZhi, WuXing, LiuQin, NajiaLine, PalaceInfo, NajiaD
 
 export const TRIGRAM_LINES: Record<string, [LinePolarity, LinePolarity, LinePolarity]> = {
   qian: ['yang', 'yang', 'yang'],
-  kun:  ['yin',  'yin',  'yin'],
+  dui:  ['yang', 'yang', 'yin'],
+  li:   ['yang', 'yin',  'yang'],
   zhen: ['yang', 'yin',  'yin'],
   xun:  ['yin',  'yang', 'yang'],
   kan:  ['yin',  'yang', 'yin'],
-  li:   ['yang', 'yin',  'yang'],
   gen:  ['yin',  'yin',  'yang'],
-  dui:  ['yang', 'yang', 'yin'],
+  kun:  ['yin',  'yin',  'yin'],
 }
 
 // ─── Na Jia: Heavenly Stems ───
 
 export const TRIGRAM_STEMS: Record<string, { inner: string; outer: string }> = {
   qian: { inner: '甲', outer: '壬' },
-  kun:  { inner: '乙', outer: '癸' },
+  dui:  { inner: '丁', outer: '丁' },
+  li:   { inner: '己', outer: '己' },
   zhen: { inner: '庚', outer: '庚' },
   xun:  { inner: '辛', outer: '辛' },
   kan:  { inner: '戊', outer: '戊' },
-  li:   { inner: '己', outer: '己' },
   gen:  { inner: '丙', outer: '丙' },
-  dui:  { inner: '丁', outer: '丁' },
+  kun:  { inner: '乙', outer: '癸' },
 }
 
 // ─── Na Jia: Earthly Branches (bottom to top) ───
 
 export const TRIGRAM_BRANCHES: Record<string, { inner: DiZhi[]; outer: DiZhi[] }> = {
   qian: { inner: ['子', '寅', '辰'], outer: ['午', '申', '戌'] },
-  kun:  { inner: ['未', '巳', '卯'], outer: ['丑', '亥', '酉'] },
+  dui:  { inner: ['巳', '卯', '丑'], outer: ['亥', '酉', '未'] },
+  li:   { inner: ['卯', '丑', '亥'], outer: ['酉', '未', '巳'] },
   zhen: { inner: ['子', '寅', '辰'], outer: ['午', '申', '戌'] },
   xun:  { inner: ['丑', '亥', '酉'], outer: ['未', '巳', '卯'] },
-  kan:  { inner: ['申', '戌', '子'], outer: ['寅', '辰', '午'] },
-  li:   { inner: ['卯', '丑', '亥'], outer: ['酉', '未', '巳'] },
+  kan:  { inner: ['寅', '辰', '午'], outer: ['申', '戌', '子'] },
   gen:  { inner: ['辰', '午', '申'], outer: ['戌', '子', '寅'] },
-  dui:  { inner: ['巳', '卯', '丑'], outer: ['亥', '酉', '未'] },
+  kun:  { inner: ['未', '巳', '卯'], outer: ['丑', '亥', '酉'] },
 }
 
 // ─── Branch → Element ───
@@ -71,29 +71,29 @@ const PALACES: PalaceEntry[] = [
     ],
   },
   {
-    key: 'kan', name: '坎宫', rootElement: '水',
+    key: 'dui', name: '兑宫', rootElement: '金',
     hexagrams: [
-      { upper: 'kan', lower: 'kan' },
-      { upper: 'kan', lower: 'dui' },
-      { upper: 'kan', lower: 'zhen' },
-      { upper: 'kan', lower: 'li' },
-      { upper: 'dui', lower: 'li' },
-      { upper: 'zhen', lower: 'li' },
-      { upper: 'kun', lower: 'li' },
-      { upper: 'kun', lower: 'kan' },
+      { upper: 'dui',  lower: 'dui' },
+      { upper: 'dui',  lower: 'kan' },
+      { upper: 'dui',  lower: 'kun' },
+      { upper: 'dui',  lower: 'gen' },
+      { upper: 'kan',  lower: 'gen' },
+      { upper: 'kun',  lower: 'gen' },
+      { upper: 'zhen', lower: 'gen' },
+      { upper: 'zhen', lower: 'dui' },
     ],
   },
   {
-    key: 'gen', name: '艮宫', rootElement: '土',
+    key: 'li', name: '离宫', rootElement: '火',
     hexagrams: [
-      { upper: 'gen', lower: 'gen' },
-      { upper: 'gen', lower: 'li' },
-      { upper: 'gen', lower: 'qian' },
-      { upper: 'gen', lower: 'dui' },
-      { upper: 'li',  lower: 'dui' },
-      { upper: 'qian', lower: 'dui' },
-      { upper: 'xun', lower: 'dui' },
-      { upper: 'xun', lower: 'gen' },
+      { upper: 'li',   lower: 'li' },
+      { upper: 'li',   lower: 'gen' },
+      { upper: 'li',   lower: 'xun' },
+      { upper: 'li',   lower: 'kan' },
+      { upper: 'gen',  lower: 'kan' },
+      { upper: 'xun',  lower: 'kan' },
+      { upper: 'qian', lower: 'kan' },
+      { upper: 'qian', lower: 'li' },
     ],
   },
   {
@@ -123,16 +123,29 @@ const PALACES: PalaceEntry[] = [
     ],
   },
   {
-    key: 'li', name: '离宫', rootElement: '火',
+    key: 'kan', name: '坎宫', rootElement: '水',
     hexagrams: [
-      { upper: 'li',   lower: 'li' },
-      { upper: 'li',   lower: 'gen' },
-      { upper: 'li',   lower: 'xun' },
-      { upper: 'li',   lower: 'kan' },
-      { upper: 'gen',  lower: 'kan' },
-      { upper: 'xun',  lower: 'kan' },
-      { upper: 'qian', lower: 'kan' },
-      { upper: 'qian', lower: 'li' },
+      { upper: 'kan', lower: 'kan' },
+      { upper: 'kan', lower: 'dui' },
+      { upper: 'kan', lower: 'zhen' },
+      { upper: 'kan', lower: 'li' },
+      { upper: 'dui', lower: 'li' },
+      { upper: 'zhen', lower: 'li' },
+      { upper: 'kun', lower: 'li' },
+      { upper: 'kun', lower: 'kan' },
+    ],
+  },
+  {
+    key: 'gen', name: '艮宫', rootElement: '土',
+    hexagrams: [
+      { upper: 'gen', lower: 'gen' },
+      { upper: 'gen', lower: 'li' },
+      { upper: 'gen', lower: 'qian' },
+      { upper: 'gen', lower: 'dui' },
+      { upper: 'li',  lower: 'dui' },
+      { upper: 'qian', lower: 'dui' },
+      { upper: 'xun', lower: 'dui' },
+      { upper: 'xun', lower: 'gen' },
     ],
   },
   {
@@ -146,19 +159,6 @@ const PALACES: PalaceEntry[] = [
       { upper: 'dui',  lower: 'qian' },
       { upper: 'kan',  lower: 'qian' },
       { upper: 'kan',  lower: 'kun' },
-    ],
-  },
-  {
-    key: 'dui', name: '兑宫', rootElement: '金',
-    hexagrams: [
-      { upper: 'dui',  lower: 'dui' },
-      { upper: 'dui',  lower: 'kan' },
-      { upper: 'dui',  lower: 'kun' },
-      { upper: 'dui',  lower: 'gen' },
-      { upper: 'kan',  lower: 'gen' },
-      { upper: 'kun',  lower: 'gen' },
-      { upper: 'zhen', lower: 'gen' },
-      { upper: 'zhen', lower: 'dui' },
     ],
   },
 ]
@@ -274,26 +274,25 @@ export function getNajiaData(upperTrigram: string, lowerTrigram: string, palace:
 
 // ─── 伏藏 positions per palace ───
 // Indexed by PALACES array order: [本宫, 一世, 二世, 三世, 四世, 五世, 游魂, 归魂]
-// Each entry lists line positions (1-based) where 伏藏 exists.
-// 乾坎艮坤: 四世/五世/游魂=[1,2,3], 归魂=[3]
-// 兑离震巽: 四世/五世=[1,3], 游魂=[1,3,4], 归魂=[4]
+// Rule: 本宫卦某爻的地支五行在当前卦六爻中不出现 → 该位置伏藏
+// Order: 乾兑离震巽坎艮坤
 const FU_CANG_POSITIONS: number[][][] = [
   // 乾(金)
-  [[], [2], [1,2], [1], [1,2,3], [1,2,3], [1,2,3], [3]],
-  // 坎(水)
-  [[], [3], [1,3], [1], [1,2,3], [1,2,3], [1,2,3], [3]],
-  // 艮(土)
-  [[], [3], [1,3], [1], [1,2,3], [1,2,3], [1,2,3], [3]],
-  // 震(木)
-  [[], [2], [1,2], [1], [1,3], [1,3], [1,3,4], [4]],
-  // 巽(木)
-  [[], [3], [1,3], [1], [1,2], [1,2], [1,2,4], [4]],
-  // 离(火)
-  [[], [2], [1,2], [1], [1,3], [1,3], [1,3,4], [4]],
-  // 坤(土)
-  [[], [3], [1,3], [1], [1,2,3], [1,2,3], [1,2,3], [3]],
+  [[], [2], [1,2], [1], [1,5], [5], [1], []],
   // 兑(金)
-  [[], [3], [1,3], [1], [1,2], [1,2], [1,2,3], [3]],
+  [[], [], [], [2], [2], [2], [2,4], [4]],
+  // 离(火)
+  [[], [1,3], [1], [3], [4], [3,4], [3], []],
+  // 震(木)
+  [[], [1], [1], [2], [2,4], [2,4], [2,4], [4]],
+  // 巽(木)
+  [[], [3], [3], [3], [], [], [3,5], [5]],
+  // 坎(水)
+  [[], [], [3], [3], [3], [], [3], []],
+  // 艮(土)
+  [[], [2,3], [2,3], [3], [5], [5], [3,5], [5]],
+  // 坤(土)
+  [[], [2], [], [2], [], [2], [2], []],
 ]
 
 /** Get 伏藏 data: returns sparse array, only positions with hidden lines have data */

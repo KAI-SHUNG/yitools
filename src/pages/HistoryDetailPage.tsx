@@ -165,6 +165,7 @@ export default function HistoryDetailPage() {
                       hexagramName={result.changed.name}
                       najia={result.changedNajia}
                       showShiYing={false}
+                      showFuCang={false}
                       compact={isMobile}
                       highlightPositions={result.changingPositions}
                     />
