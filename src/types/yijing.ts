@@ -52,6 +52,9 @@ export type WuXing = '金' | '木' | '水' | '火' | '土'
 /** Earthly Branch */
 export type DiZhi = '子' | '丑' | '寅' | '卯' | '辰' | '巳' | '午' | '未' | '申' | '酉' | '戌' | '亥'
 
+/** Six Spirits (六神) — assigned per line, starting point determined by day stem */
+export type LiuShen = '青龙' | '朱雀' | '勾陈' | '螣蛇' | '白虎' | '玄武'
+
 /** Na Jia info for a single line */
 export interface NajiaLine {
   liuQin: LiuQin

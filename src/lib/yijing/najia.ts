@@ -1,17 +1,5 @@
-import type { LinePolarity, DiZhi, WuXing, LiuQin, NajiaLine, PalaceInfo, NajiaData } from '../../types/yijing'
-
-// ─── Trigram Line Patterns (bottom to top) ───
-
-export const TRIGRAM_LINES: Record<string, [LinePolarity, LinePolarity, LinePolarity]> = {
-  qian: ['yang', 'yang', 'yang'],
-  dui:  ['yang', 'yang', 'yin'],
-  li:   ['yang', 'yin',  'yang'],
-  zhen: ['yang', 'yin',  'yin'],
-  xun:  ['yin',  'yang', 'yang'],
-  kan:  ['yin',  'yang', 'yin'],
-  gen:  ['yin',  'yin',  'yang'],
-  kun:  ['yin',  'yin',  'yin'],
-}
+import type { LinePolarity, DiZhi, WuXing, LiuQin, LiuShen, NajiaLine, PalaceInfo, NajiaData } from '../../types/yijing'
+import { TRIGRAMS, trigramKeyFromLines } from './trigrams'
 
 // ─── Na Jia: Heavenly Stems ───
 
@@ -45,6 +33,28 @@ const BRANCH_ELEMENT: Record<DiZhi, WuXing> = {
   子: '水', 丑: '土', 寅: '木', 卯: '木',
   辰: '土', 巳: '火', 午: '火', 未: '土',
   申: '金', 酉: '金', 戌: '土', 亥: '水',
+}
+
+// ─── Six Spirits (六神) ───
+// Fixed cycle: 青龙→朱雀→勾陈→螣蛇→白虎→玄武, from line 1 (bottom) to line 6 (top)
+// Day stem (日干) determines the starting spirit at line 1
+
+const LIU_SHEN_BY_GAN: Record<string, LiuShen[]> = {
+  甲: ['青龙', '朱雀', '勾陈', '螣蛇', '白虎', '玄武'],
+  乙: ['青龙', '朱雀', '勾陈', '螣蛇', '白虎', '玄武'],
+  丙: ['朱雀', '勾陈', '螣蛇', '白虎', '玄武', '青龙'],
+  丁: ['朱雀', '勾陈', '螣蛇', '白虎', '玄武', '青龙'],
+  戊: ['勾陈', '螣蛇', '白虎', '玄武', '青龙', '朱雀'],
+  己: ['螣蛇', '白虎', '玄武', '青龙', '朱雀', '勾陈'],
+  庚: ['白虎', '玄武', '青龙', '朱雀', '勾陈', '螣蛇'],
+  辛: ['白虎', '玄武', '青龙', '朱雀', '勾陈', '螣蛇'],
+  壬: ['玄武', '青龙', '朱雀', '勾陈', '螣蛇', '白虎'],
+  癸: ['玄武', '青龙', '朱雀', '勾陈', '螣蛇', '白虎'],
+}
+
+/** Get 六神 array for 6 line positions (bottom to top) from day stem */
+export function getLiuShen(dayGan: string): LiuShen[] {
+  return LIU_SHEN_BY_GAN[dayGan] ?? LIU_SHEN_BY_GAN['甲']
 }
 
 // ─── Eight Palace Data ───
@@ -193,23 +203,13 @@ for (let pi = 0; pi < PALACES.length; pi++) {
   }
 }
 
-/** Get trigram key from 3 lines (bottom to top) */
-function trigramFromLines(lines: [LinePolarity, LinePolarity, LinePolarity]): string | undefined {
-  for (const [key, pattern] of Object.entries(TRIGRAM_LINES)) {
-    if (pattern[0] === lines[0] && pattern[1] === lines[1] && pattern[2] === lines[2]) {
-      return key
-    }
-  }
-  return undefined
-}
-
 /** Look up palace info for a hexagram by its 6 polarities (bottom to top) */
 export function lookupPalace(yaos: LinePolarity[]): PalaceInfo | undefined {
   if (yaos.length !== 6) return undefined
   const lowerLines: [LinePolarity, LinePolarity, LinePolarity] = [yaos[0], yaos[1], yaos[2]]
   const upperLines: [LinePolarity, LinePolarity, LinePolarity] = [yaos[3], yaos[4], yaos[5]]
-  const lowerKey = trigramFromLines(lowerLines)
-  const upperKey = trigramFromLines(upperLines)
+  const lowerKey = trigramKeyFromLines(lowerLines)
+  const upperKey = trigramKeyFromLines(upperLines)
   if (!lowerKey || !upperKey) return undefined
 
   const entry = PALACE_MAP.get(`${upperKey}-${lowerKey}`)
@@ -328,8 +328,8 @@ export function getFullNajia(upperTrigram: string, lowerTrigram: string, yaos: L
   if (yaos.length !== 6) return undefined
   const lowerLines: [LinePolarity, LinePolarity, LinePolarity] = [yaos[0], yaos[1], yaos[2]]
   const upperLines: [LinePolarity, LinePolarity, LinePolarity] = [yaos[3], yaos[4], yaos[5]]
-  const lowerKey = trigramFromLines(lowerLines)
-  const upperKey = trigramFromLines(upperLines)
+  const lowerKey = trigramKeyFromLines(lowerLines)
+  const upperKey = trigramKeyFromLines(upperLines)
   if (!lowerKey || !upperKey) return undefined
 
   const entry = PALACE_MAP.get(`${upperKey}-${lowerKey}`)

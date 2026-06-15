@@ -6,8 +6,9 @@ import ManualInput from '../components/divination/ManualInput'
 import HexagramDisplay from '../components/divination/HexagramDisplay'
 import UserMenu from '../components/auth/UserMenu'
 import { performDivination } from '../lib/yijing/divination'
-import { getDateTimePillars } from '../lib/yijing/datetime'
+import { getDateTimePillars, getDayGan } from '../lib/yijing/datetime'
 import { generateCopyText } from '../lib/yijing/copyText'
+import { getLiuShen } from '../lib/yijing/najia'
 import DateTimePicker from '../components/divination/DateTimePicker'
 import { YAO_CI } from '../data/yaoci'
 import { useAuth } from '../hooks/useAuth'
@@ -135,6 +136,7 @@ export default function DivinationPage() {
 
         {result && (() => {
           const dt = getDateTimePillars(selectedTime)
+          const liuShen = getLiuShen(getDayGan(selectedTime))
           return (
           <div className="flex flex-col items-center gap-4 sm:gap-6 w-full">
 
@@ -161,6 +163,7 @@ export default function DivinationPage() {
                   yaos={result.yaos}
                   hexagramName={result.entry.fullName}
                   najia={result.najia}
+                  liuShen={liuShen}
                   liuChong={result.entry.liuChong}
                   liuHe={result.entry.liuHe}
                   compact={isMobile}

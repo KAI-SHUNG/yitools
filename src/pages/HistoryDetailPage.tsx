@@ -5,7 +5,8 @@ import HexagramDisplay from '../components/divination/HexagramDisplay'
 import { useAuth } from '../hooks/useAuth'
 import { getSupabase } from '../lib/supabase/client'
 import { reconstructDivination } from '../lib/yijing/divination'
-import { getDateTimePillars } from '../lib/yijing/datetime'
+import { getDateTimePillars, getDayGan } from '../lib/yijing/datetime'
+import { getLiuShen } from '../lib/yijing/najia'
 import { generateCopyText } from '../lib/yijing/copyText'
 import { YAO_CI } from '../data/yaoci'
 import type { DivinationResult } from '../types/yijing'
@@ -112,6 +113,7 @@ export default function HistoryDetailPage() {
           </div>
         ) : (() => {
           const dt = getDateTimePillars(result.timestamp)
+          const liuShen = getLiuShen(getDayGan(result.timestamp))
           return (
             <div className="flex flex-col items-center gap-4 sm:gap-6 w-full">
               {/* 事项 */}
@@ -149,6 +151,7 @@ export default function HistoryDetailPage() {
                     yaos={result.yaos}
                     hexagramName={result.entry.fullName}
                     najia={result.najia}
+                    liuShen={liuShen}
                     liuChong={result.entry.liuChong}
                     liuHe={result.entry.liuHe}
                     compact={isMobile}

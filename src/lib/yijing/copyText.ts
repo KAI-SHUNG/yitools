@@ -1,5 +1,6 @@
-import type { DivinationResult, HexagramEntry, Yao, NajiaData } from '../../types/yijing'
-import { getDateTimePillars } from './datetime'
+import type { DivinationResult, HexagramEntry, Yao, LiuShen, NajiaData } from '../../types/yijing'
+import { getDateTimePillars, getDayGan } from './datetime'
+import { getLiuShen } from './najia'
 
 /** Get palace type label: 本宫/一世/二世/.../游魂/归魂 */
 function getPalaceTypeLabel(position: number, isYouHun: boolean, isGuiHun: boolean): string {
@@ -15,6 +16,7 @@ function formatHexagramSection(
   yaos: Yao[],
   najia: NajiaData | null,
   showFlags: boolean,
+  liuShen?: LiuShen[],
 ): string {
   const lines: string[] = []
   const shortName = entry.name
@@ -37,7 +39,8 @@ function formatHexagramSection(
     const fuCang = najia?.fuCang?.[pos - 1]
 
     if (lineNajia) {
-      let text = `${lineNajia.liuQin} ${lineNajia.diZhi}${lineNajia.wuXing}`
+      const shen = liuShen?.[pos - 1]
+      let text = (shen ? `${shen} ` : '') + `${lineNajia.liuQin} ${lineNajia.diZhi}${lineNajia.wuXing}`
       if (lineNajia.isShi) text += ' 世'
       if (lineNajia.isYing) text += ' 应'
       if (yao.isChanging) text += yao.polarity === 'yang' ? ' ○' : ' ×'
@@ -54,6 +57,7 @@ function formatHexagramSection(
 /** Generate full copy text for a divination result */
 export function generateCopyText(result: DivinationResult, question: string): string {
   const dt = getDateTimePillars(result.timestamp)
+  const liuShen = getLiuShen(getDayGan(result.timestamp))
   const parts: string[] = []
 
   // AI prompt preamble
@@ -73,7 +77,7 @@ export function generateCopyText(result: DivinationResult, question: string): st
 
   // 本卦
   parts.push('【本卦】')
-  parts.push(formatHexagramSection(result.entry, result.yaos, result.najia, true))
+  parts.push(formatHexagramSection(result.entry, result.yaos, result.najia, true, liuShen))
   parts.push('')
 
   // 变卦

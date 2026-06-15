@@ -125,6 +125,13 @@ function getShunKong(date: Date): string[] {
   return [DI_ZHI[m1], DI_ZHI[m2]]
 }
 
+// ─── Day Stem helper ───
+
+/** Get the day heavenly stem (日干) for 六神 assignment */
+export function getDayGan(date: Date): string {
+  return dayPillar(date).gan
+}
+
 // ─── Public API ───
 
 export interface DateTimePillars {
