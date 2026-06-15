@@ -21,3 +21,17 @@ export const TRIGRAMS: Record<string, Trigram> = {
 export function getTrigramKey(name: string): string | undefined {
   return Object.keys(TRIGRAMS).find(key => TRIGRAMS[key].name === name)
 }
+
+/** Get trigram key from 3 polarities (bottom to top) */
+export function trigramKeyFromLines(lines: [LinePolarity, LinePolarity, LinePolarity]): string | undefined {
+  for (const [key, trigram] of Object.entries(TRIGRAMS)) {
+    if (
+      trigram.lines[0] === lines[0] &&
+      trigram.lines[1] === lines[1] &&
+      trigram.lines[2] === lines[2]
+    ) {
+      return key
+    }
+  }
+  return undefined
+}
