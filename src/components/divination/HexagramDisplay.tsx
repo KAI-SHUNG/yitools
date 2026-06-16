@@ -16,10 +16,10 @@ interface Props {
 export default function HexagramDisplay({ yaos, hexagramName, najia, liuShen, liuChong, liuHe, showShiYing = true, showFuCang = true, compact = false, highlightPositions = [] }: Props) {
   const sorted = [...yaos].sort((a, b) => b.position - a.position)
   const lineWidth = compact ? 64 : 108
-  const leftW = compact ? 110 : 190
-  const rightW = compact ? 40 : 64
+  const leftW = compact ? 64 : 96
+  const rightW = compact ? 40 : 56
   const liuShenW = compact ? 28 : 36
-  const rowMinW = compact ? 250 : 410
+  const rowMinW = compact ? 220 : 310
 
   return (
     <div className="flex flex-col items-center">
@@ -40,7 +40,7 @@ export default function HexagramDisplay({ yaos, hexagramName, najia, liuShen, li
         {liuHe && <span className="text-lake-green">六合</span>}
       </div>
 
-      <div className={`flex flex-col ${compact ? 'gap-1' : 'gap-1.3'}`}>
+      <div className={`flex flex-col ${compact ? 'gap-3' : 'gap-4'}`}>
         {sorted.map((yao) => {
           const lineNajia = najia?.lines[yao.position - 1]
           const fuCangLine = showFuCang ? najia?.fuCang?.[yao.position - 1] : undefined
@@ -60,8 +60,8 @@ export default function HexagramDisplay({ yaos, hexagramName, najia, liuShen, li
                   {shen ?? ''}
                 </span>
 
-                {/* 六亲 + 地支五行 / 伏藏 below */}
-                <div className="flex flex-col items-end" style={{ width: leftW }}>
+                {/* 六亲 + 地支五行 / 伏藏(absolute, out of flow) */}
+                <div className="relative flex flex-col items-end" style={{ width: leftW }}>
                   <div className={`flex items-center whitespace-nowrap ${compact ? 'text-xs gap-0.5' : 'text-base gap-2'}`}>
                     {lineNajia ? (
                       <>
@@ -72,9 +72,9 @@ export default function HexagramDisplay({ yaos, hexagramName, najia, liuShen, li
                       <span className="text-ink-light">--</span>
                     )}
                   </div>
-                  {/* 伏藏: below 六亲+地支, small red; always reserve height for equal spacing */}
+                  {/* 伏藏: absolute below 纳甲, out of flex flow — all rows stay aligned */}
                   <div
-                    className="text-red-500 leading-none"
+                    className="absolute top-full right-0 text-red-500 leading-none whitespace-nowrap"
                     style={{ fontSize: compact ? 12 : 13, visibility: fuCangLine ? 'visible' : 'hidden' }}
                   >
                     {fuCangLine ? `伏 ${fuCangLine.liuQin}${fuCangLine.diZhi}${fuCangLine.wuXing}` : '伏'}
