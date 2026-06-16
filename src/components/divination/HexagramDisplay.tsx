@@ -18,7 +18,7 @@ export default function HexagramDisplay({ yaos, hexagramName, najia, liuShen, li
   const lineWidth = compact ? 64 : 108
   const leftW = compact ? 110 : 190
   const rightW = compact ? 40 : 64
-  const liuShenW = compact ? 18 : 24
+  const liuShenW = compact ? 28 : 36
   const rowMinW = compact ? 250 : 410
 
   return (
