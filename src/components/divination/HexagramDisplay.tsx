@@ -40,7 +40,7 @@ export default function HexagramDisplay({ yaos, hexagramName, najia, liuShen, li
         {liuHe && <span className="text-lake-green">六合</span>}
       </div>
 
-      <div className={`flex flex-col ${compact ? 'gap-1.5' : 'gap-3'}`}>
+      <div className={`flex flex-col ${compact ? 'gap-1' : 'gap-1.3'}`}>
         {sorted.map((yao) => {
           const lineNajia = najia?.lines[yao.position - 1]
           const fuCangLine = showFuCang ? najia?.fuCang?.[yao.position - 1] : undefined
@@ -60,16 +60,25 @@ export default function HexagramDisplay({ yaos, hexagramName, najia, liuShen, li
                   {shen ?? ''}
                 </span>
 
-                {/* 六亲 + 地支五行 */}
-                <div className={`flex items-center whitespace-nowrap ${compact ? 'text-xs gap-0.5' : 'text-base gap-2'}`} style={{ width: leftW, justifyContent: 'flex-end' }}>
-                  {lineNajia ? (
-                    <>
-                      <span className={`font-bold shrink-0 ${highlightColor || 'text-ink-black'}`}>{lineNajia.liuQin}</span>
-                      <span className={`font-bold shrink-0 ${highlightColor || 'text-ink-black'}`}>{lineNajia.diZhi}{lineNajia.wuXing}</span>
-                    </>
-                  ) : (
-                    <span className="text-ink-light">--</span>
-                  )}
+                {/* 六亲 + 地支五行 / 伏藏 below */}
+                <div className="flex flex-col items-end" style={{ width: leftW }}>
+                  <div className={`flex items-center whitespace-nowrap ${compact ? 'text-xs gap-0.5' : 'text-base gap-2'}`}>
+                    {lineNajia ? (
+                      <>
+                        <span className={`font-bold shrink-0 ${highlightColor || 'text-ink-black'}`}>{lineNajia.liuQin}</span>
+                        <span className={`font-bold shrink-0 ${highlightColor || 'text-ink-black'}`}>{lineNajia.diZhi}{lineNajia.wuXing}</span>
+                      </>
+                    ) : (
+                      <span className="text-ink-light">--</span>
+                    )}
+                  </div>
+                  {/* 伏藏: below 六亲+地支, small red; always reserve height for equal spacing */}
+                  <div
+                    className="text-red-500 leading-none"
+                    style={{ fontSize: compact ? 12 : 13, visibility: fuCangLine ? 'visible' : 'hidden' }}
+                  >
+                    {fuCangLine ? `伏 ${fuCangLine.liuQin}${fuCangLine.diZhi}${fuCangLine.wuXing}` : '伏'}
+                  </div>
                 </div>
 
                 {/* 爻线 */}
@@ -91,16 +100,6 @@ export default function HexagramDisplay({ yaos, hexagramName, najia, liuShen, li
                   )}
                 </div>
               </div>
-
-              {/* 伏藏: below main row, small red */}
-              {fuCangLine && (
-                <div
-                  className="text-red-500 leading-none"
-                  style={{ fontSize: compact ? 10 : 11, paddingLeft: liuShenW + leftW + lineWidth + 16 }}
-                >
-                  伏 {fuCangLine.liuQin}{fuCangLine.diZhi}{fuCangLine.wuXing}
-                </div>
-              )}
             </div>
           )
         })}
